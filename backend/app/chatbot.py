@@ -28,6 +28,10 @@ def detect_intent(message: str, repo_names: list[str]) -> tuple[str, str | None]
     return "fallback", None
 
 
+def _plural(n: int, word: str) -> str:
+    return f"{n} {word}" if n == 1 else f"{n} {word}s"
+
+
 def _join(items: list[str]) -> str:
     return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
 
@@ -53,8 +57,9 @@ def reply(username: str, message: str) -> dict:
     elif intent == "activity":
         try:
             c = services.build_contributions(username)
-            text = (f"{c['total']} contributions in the last year across {c['active_days']} active days. "
-                    f"Current streak: {c['current_streak']} days, longest: {c['longest_streak']} days.")
+            text = (f"{_plural(c['total'], 'contribution')} in the last year across "
+                    f"{_plural(c['active_days'], 'active day')}. Current streak: {_plural(c['current_streak'], 'day')}, "
+                    f"longest: {_plural(c['longest_streak'], 'day')}.")
         except GitHubError:
             text = "Contribution data isn't available right now."
     elif intent == "match":

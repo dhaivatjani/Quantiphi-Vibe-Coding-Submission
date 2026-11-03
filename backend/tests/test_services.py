@@ -32,3 +32,8 @@ assert detect_intent("is this a good fit for the job", repos)[0] == "match"
 assert detect_intent("hello there", repos)[0] == "fallback"
 assert all(detect_intent(s, repos)[0] != "fallback" for s in SUGGESTIONS)
 print("chatbot ok")
+
+from app.chatbot import _plural
+
+assert _plural(1, "day") == "1 day" and _plural(3, "day") == "3 days" and _plural(0, "day") == "0 days"
+print("plural ok")
