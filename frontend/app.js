@@ -81,7 +81,10 @@ async function loadActivity(username) {
 
 async function load(username) {
   loadActivity(username).catch(() => {});
-  $("match-badge").hidden = true;
+  $("match-badge").hidden = $("advice").hidden = true;
+  setChatOpen(false);
+  $("chat-log").replaceChildren(el("li", { className: "bot", textContent: `Hi! Ask me anything about ${username}'s GitHub profile.` }));
+  renderSuggestions(["Which languages are used most?", "Which repo is the most popular?", "How active is this developer?"]);
   setStatus(`Loading ${username}…`);
   try {
     const res = await fetch(`/api/profile/${encodeURIComponent(username)}`);
@@ -90,10 +93,11 @@ async function load(username) {
     renderHeader(data);
     renderRepos(data.repos);
     $("profile").hidden = $("repos-section").hidden = false;
+    $("chat-toggle").hidden = false;
     setStatus("");
     history.replaceState(null, "", `?user=${encodeURIComponent(username)}`);
   } catch (err) {
-    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = true;
+    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("chat-toggle").hidden = true;
     setStatus(`${err.message} Check the username and try again.`, true);
   }
 }
@@ -127,6 +131,63 @@ $("match-form").addEventListener("submit", async (e) => {
   }
   renderMatch(data);
   $("match-dialog").close();
+  loadAdvice(username);
+});
+
+async function loadAdvice(username) {
+  const res = await fetch(`/api/advice/${encodeURIComponent(username)}`);
+  const a = await res.json();
+  if (!res.ok || !a.has_jd) return;
+  $("advice-list").replaceChildren(...(a.suggestions.length
+    ? a.suggestions.map((s) => el("li", {}, [el("strong", { textContent: s.language }), el("span", { textContent: s.idea })]))
+    : [el("li", { textContent: a.message })]));
+  $("advice").hidden = false;
+}
+
+// Portfolio assistant: the backend detects intent and writes the reply.
+const currentUser = () => new URLSearchParams(location.search).get("user");
+
+function addMessage(text, who) {
+  $("chat-log").append(el("li", { className: who, textContent: text }));
+  $("chat-log").scrollTop = $("chat-log").scrollHeight;
+}
+
+async function ask(message) {
+  addMessage(message, "me");
+  try {
+    const res = await fetch(`/api/chat/${encodeURIComponent(currentUser())}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
+    });
+    const data = await res.json();
+    addMessage(res.ok ? data.reply : "I couldn't answer that. Try one of the suggested questions.", "bot");
+    if (res.ok) renderSuggestions(data.suggestions);
+  } catch {
+    addMessage("The assistant is unreachable. Check that the server is running.", "bot");
+  }
+}
+
+function renderSuggestions(list) {
+  $("chat-suggestions").replaceChildren(...list.map((q) =>
+    el("button", { type: "button", textContent: q, onclick: () => ask(q) })));
+}
+
+function setChatOpen(open) {
+  $("chat").hidden = !open;
+  $("chat-toggle").hidden = open;
+  $("chat-toggle").setAttribute("aria-expanded", open);
+  if (open) $("chat-input").focus();
+}
+
+$("chat-toggle").addEventListener("click", () => setChatOpen(true));
+$("chat-close").addEventListener("click", () => setChatOpen(false));
+$("chat-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const msg = $("chat-input").value.trim();
+  if (!msg) return;
+  $("chat-input").value = "";
+  ask(msg);
 });
 
 $("match-open").addEventListener("click", () => {
