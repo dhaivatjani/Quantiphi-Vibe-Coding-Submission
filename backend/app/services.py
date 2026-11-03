@@ -23,6 +23,28 @@ def _repo_card(repo: dict) -> dict:
     }
 
 
+def _pinned_card(node: dict) -> dict:
+    return {
+        "name": node["name"],
+        "url": node["url"],
+        "description": node["description"] or "",
+        "language": (node["primaryLanguage"] or {}).get("name"),
+        "stars": node["stargazerCount"],
+        "forks": node["forkCount"],
+        "is_fork": node["isFork"],
+        "updated_at": node["updatedAt"],
+        "topics": [],
+    }
+
+
+def pinned_cards(username: str) -> list[dict]:
+    """Pinned repos are optional: without a token or on error, show none."""
+    try:
+        return [_pinned_card(n) for n in github_client.get_pinned(username) if n]
+    except GitHubError:
+        return []
+
+
 def language_breakdown(repos: list[dict]) -> list[dict]:
     """Share of repos per primary language, as percentages (most used first)."""
     counts = Counter(r["language"] for r in repos if r["language"])
@@ -89,6 +111,7 @@ def build_profile(username: str) -> dict:
         "total_stars": sum(c["stars"] for c in cards),
         "total_forks": sum(c["forks"] for c in cards),
         "top_languages": language_breakdown(repos),
+        "pinned": pinned_cards(username),
         "repos": cards,
     }
 

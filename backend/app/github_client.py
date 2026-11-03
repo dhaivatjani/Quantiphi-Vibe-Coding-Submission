@@ -38,6 +38,42 @@ def get_user(username: str) -> dict:
     return data
 
 
+def _graphql_user(query: str, username: str, feature: str) -> dict:
+    """Run a GraphQL query with a $login variable and return data.user."""
+    if not GITHUB_TOKEN:
+        raise GitHubError(503, f"{feature} needs GITHUB_TOKEN in .env")
+    resp = httpx.post(f"{API}/graphql", json={"query": query, "variables": {"login": username}},
+                      headers=_headers(), timeout=15)
+    resp.raise_for_status()
+    user = (resp.json().get("data") or {}).get("user")
+    if user is None:
+        raise GitHubError(404, "GitHub user not found")
+    return user
+
+
+PINNED_QUERY = """
+query($login: String!) {
+  user(login: $login) {
+    pinnedItems(first: 6, types: REPOSITORY) {
+      nodes { ... on Repository {
+        name url description stargazerCount forkCount isFork updatedAt
+        primaryLanguage { name }
+      } }
+    }
+  }
+}
+"""
+
+
+def get_pinned(username: str) -> list[dict]:
+    """Repos the user pinned on their GitHub profile (GraphQL only)."""
+    key = f"pinned:{username.lower()}"
+    if (data := cache.get(key)) is None:
+        data = _graphql_user(PINNED_QUERY, username, "Pinned repos")["pinnedItems"]["nodes"]
+        cache.set(key, data)
+    return data
+
+
 CONTRIBUTIONS_QUERY = """
 query($login: String!) {
   user(login: $login) {
@@ -57,18 +93,7 @@ def get_contribution_days(username: str) -> list[dict]:
     key = f"contrib:{username.lower()}"
     if (data := cache.get(key)) is not None:
         return data
-    if not GITHUB_TOKEN:
-        raise GitHubError(503, "Contribution graph needs GITHUB_TOKEN in .env")
-    resp = httpx.post(
-        f"{API}/graphql",
-        json={"query": CONTRIBUTIONS_QUERY, "variables": {"login": username}},
-        headers=_headers(),
-        timeout=15,
-    )
-    resp.raise_for_status()
-    user = resp.json().get("data", {}).get("user")
-    if user is None:
-        raise GitHubError(404, "GitHub user not found")
+    user = _graphql_user(CONTRIBUTIONS_QUERY, username, "Contribution graph")
     weeks = user["contributionsCollection"]["contributionCalendar"]["weeks"]
     data = [day for week in weeks for day in week["contributionDays"]]
     cache.set(key, data)

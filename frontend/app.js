@@ -47,8 +47,8 @@ function renderHeader(p) {
   ));
 }
 
-function renderRepos(repos) {
-  $("repos").replaceChildren(...repos.map((r) =>
+function renderRepos(repos, listId = "repos") {
+  $(listId).replaceChildren(...repos.map((r) =>
     el("li", { className: "repo" }, [
       el("h3", {}, [el("a", { href: r.url, target: "_blank", rel: "noopener", textContent: r.name })]),
       el("p", { textContent: r.description || "No description." }),
@@ -127,12 +127,14 @@ async function load(username) {
     if (!res.ok) throw new Error(data.detail || "Could not load this profile.");
     renderHeader(data);
     renderRepos(data.repos);
+    renderRepos(data.pinned, "pinned");
+    $("pinned-section").hidden = !data.pinned.length;
     $("profile").hidden = $("repos-section").hidden = false;
     $("chat-toggle").hidden = false;
     setStatus("");
     history.replaceState(null, "", `?user=${encodeURIComponent(username)}`);
   } catch (err) {
-    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("insights").hidden = $("chat-toggle").hidden = true;
+    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("insights").hidden = $("pinned-section").hidden = $("chat-toggle").hidden = true;
     setStatus(`${err.message} Check the username and try again.`, true);
   }
 }
