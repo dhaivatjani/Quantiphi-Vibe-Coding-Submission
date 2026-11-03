@@ -82,7 +82,12 @@
   <dialog id="match-dialog" class="match-dialog" aria-labelledby="match-title">
     <form id="match-form">
       <h2 id="match-title">Check fit for a job</h2>
-      <label for="jd">Paste the job description. We'll compare the languages it asks for with the ones in these repositories.</label>
+      <label for="jd">Paste the job description or upload it. We'll compare the languages it asks for with the ones in these repositories.</label>
+      <div class="upload-row">
+        <label for="jd-file" class="upload-btn">Upload PDF or .txt</label>
+        <input id="jd-file" type="file" accept=".pdf,.txt,application/pdf,text/plain" class="sr-only">
+        <span id="jd-file-status" class="upload-status" role="status"></span>
+      </div>
       <textarea id="jd" rows="12" minlength="10" maxlength="20000" required placeholder="e.g. We're hiring a backend engineer with Python, Go and PostgreSQL experience…"></textarea>
       <p id="match-error" class="match-error" role="alert" hidden></p>
       <div class="dialog-actions">

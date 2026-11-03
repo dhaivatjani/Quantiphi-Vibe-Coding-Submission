@@ -1,10 +1,11 @@
 import re
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import advisor, chatbot, services
+from . import advisor, chatbot, documents, services
+from .documents import MAX_UPLOAD_BYTES, DocumentError
 from .config import FRONTEND_DIR
 from .github_client import GitHubError
 from .matcher import MAX_JD_LENGTH
@@ -40,6 +41,15 @@ def contributions(username: str):
         return services.build_contributions(_validate_username(username))
     except GitHubError as e:
         raise HTTPException(e.status, str(e))
+
+
+@app.post("/api/job-description/extract")
+async def extract_job_description(file: UploadFile):
+    data = await file.read(MAX_UPLOAD_BYTES + 1)  # read one extra byte to detect oversize files
+    try:
+        return {"filename": file.filename, "text": documents.extract_text(file.filename, data)}
+    except DocumentError as e:
+        raise HTTPException(400, str(e))
 
 
 class MatchRequest(BaseModel):

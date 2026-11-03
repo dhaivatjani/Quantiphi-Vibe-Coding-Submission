@@ -192,3 +192,14 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 1
 .chat-form button { font: 500 0.93rem var(--body); padding: 8px 14px; border-radius: 8px; cursor: pointer; background: var(--ink); color: var(--sheet); border: 0; }
 .activity-error { color: var(--ink-soft); }
 
+
+/* JD file upload */
+.upload-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.upload-btn {
+  font: 500 0.9rem var(--body); padding: 7px 14px; border-radius: 8px; cursor: pointer;
+  border: 1px dashed var(--ink-soft); color: var(--ink);
+}
+.upload-btn:hover { border-style: solid; }
+.upload-row:focus-within .upload-btn { outline: 3px solid var(--marigold); outline-offset: 2px; }
+.upload-status { font-size: 0.88rem; color: var(--ink-soft); }
+.upload-status.error { color: var(--danger); }

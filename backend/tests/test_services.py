@@ -37,3 +37,14 @@ from app.chatbot import _plural
 
 assert _plural(1, "day") == "1 day" and _plural(3, "day") == "3 days" and _plural(0, "day") == "0 days"
 print("plural ok")
+
+from app.documents import DocumentError, extract_text
+
+assert extract_text("jd.txt", b"Python developer") == "Python developer"
+for name, data in [("jd.docx", b"x"), ("empty.txt", b"   "), ("broken.pdf", b"%PDF-garbage")]:
+    try:
+        extract_text(name, data)
+        raise AssertionError(f"{name} should be rejected")
+    except DocumentError:
+        pass
+print("documents ok")

@@ -205,9 +205,33 @@ $("chat-form").addEventListener("submit", (e) => {
 
 $("match-open").addEventListener("click", () => {
   $("match-error").hidden = true;
+  $("jd-file-status").textContent = "";
   $("match-dialog").showModal();
 });
 $("match-cancel").addEventListener("click", () => $("match-dialog").close());
+
+// The backend extracts the text; we just show it so the user can review before matching.
+$("jd-file").addEventListener("change", async () => {
+  const file = $("jd-file").files[0];
+  if (!file) return;
+  const status = $("jd-file-status");
+  status.className = "upload-status";
+  status.textContent = `Reading ${file.name}…`;
+  const form = new FormData();
+  form.append("file", file);
+  try {
+    const res = await fetch("/api/job-description/extract", { method: "POST", body: form });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Couldn't read this file.");
+    $("jd").value = data.text;
+    status.textContent = `Loaded ${data.filename}. Review the text, then check the match.`;
+  } catch (err) {
+    status.className = "upload-status error";
+    status.textContent = err.message;
+  } finally {
+    $("jd-file").value = ""; // allow re-uploading the same file
+  }
+});
 
 $("lookup").addEventListener("submit", (e) => {
   e.preventDefault();
