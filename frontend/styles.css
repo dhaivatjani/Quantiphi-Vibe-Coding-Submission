@@ -54,7 +54,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
 .bio { max-width: 60ch; color: var(--ink-soft); margin: 8px 0 0; }
 
 .stats { grid-area: stats; display: flex; gap: 40px; margin: 0; flex-wrap: wrap; align-self: end; align-items: flex-start; }
-.stats div { border-left: 3px solid var(--marigold); padding-left: 12px; }
+.stats div { border-top: 1px solid var(--ink); padding-top: 8px; min-width: 120px; }
 .stats dt { color: var(--ink-soft); font-size: 0.9rem; }
 .stats dd { margin: 0; font: 700 2rem/1.1 var(--display); }
 
