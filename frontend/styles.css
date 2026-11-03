@@ -306,7 +306,8 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 1
 .profile-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 @media print {
-  :root { --paper: #ffffff; --sheet: #ffffff; --ink: #14213d; --ink-soft: #4a5875; --rule: #c9d3df; color-scheme: light; }
+  /* Theme is switched to light in JS (beforeprint); just drop the page tint. */
+  :root { --paper: #ffffff; --sheet: #ffffff; }
   .topbar, .profile-actions, .chat-toggle, .chat, dialog, .compare-form, #compare-status:empty { display: none !important; }
   body { background: #fff; }
   main { padding: 0; max-width: none; }

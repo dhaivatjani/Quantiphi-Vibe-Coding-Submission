@@ -20,7 +20,7 @@ function el(tag, props = {}, children = []) {
   return node;
 }
 
-function renderHeader(p) {
+function renderHeader(p, animate = true) {
   lastProfile = p;
   const PALETTE = palette();
   $("avatar").src = p.avatar_url;
@@ -42,7 +42,7 @@ function renderHeader(p) {
       labels: langs.map((l) => l.language),
       datasets: [{ data: langs.map((l) => l.percent), backgroundColor: PALETTE, borderWidth: 0 }],
     },
-    options: { maintainAspectRatio: false, cutout: "58%", plugins: { legend: { display: false } } },
+    options: { maintainAspectRatio: false, cutout: "58%", ...(animate ? {} : { animation: false }), plugins: { legend: { display: false } } },
   });
   $("lang-legend").replaceChildren(...langs.map((l, i) =>
     el("li", {}, [
@@ -364,3 +364,16 @@ $("theme-toggle").addEventListener("click", () => {
 syncThemeButton();
 
 $("print-btn").addEventListener("click", () => window.print());
+
+// PDFs always use the light theme: swap before printing (also covers Ctrl+P), restore after.
+let themeBeforePrint;
+addEventListener("beforeprint", () => {
+  themeBeforePrint = document.documentElement.dataset.theme;
+  document.documentElement.dataset.theme = "light";
+  if (lastProfile) renderHeader(lastProfile, false); // redraw chart in light colors, no animation
+});
+addEventListener("afterprint", () => {
+  if (themeBeforePrint) document.documentElement.dataset.theme = themeBeforePrint;
+  else delete document.documentElement.dataset.theme;
+  if (lastProfile) renderHeader(lastProfile, false);
+});
