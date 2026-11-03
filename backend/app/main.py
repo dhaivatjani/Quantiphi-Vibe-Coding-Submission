@@ -32,5 +32,13 @@ def profile(username: str):
         raise HTTPException(e.status, str(e))
 
 
+@app.get("/api/contributions/{username}")
+def contributions(username: str):
+    try:
+        return services.build_contributions(_validate_username(username))
+    except GitHubError as e:
+        raise HTTPException(e.status, str(e))
+
+
 # Frontend is presentation only; served as static files by the same app.
 app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

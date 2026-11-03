@@ -59,7 +59,28 @@ function renderRepos(repos) {
   ));
 }
 
+async function loadActivity(username) {
+  $("activity").hidden = true;
+  const res = await fetch(`/api/contributions/${encodeURIComponent(username)}`);
+  if (!res.ok) return; // heatmap is optional; profile still renders
+  const c = await res.json();
+  // Pad so the first column starts on Sunday, like a calendar.
+  const pad = new Date(c.days[0].date + "T00:00:00Z").getUTCDay();
+  $("heatmap").replaceChildren(
+    ...Array.from({ length: pad }, () => el("i", { style: "visibility:hidden" })),
+    ...c.days.map((d) => el("i", { className: `l${d.level}`, title: `${d.count} contributions on ${d.date}` }))
+  );
+  $("heatmap").setAttribute("aria-label", `${c.total} contributions in the last year`);
+  $("activity-summary").replaceChildren(
+    el("strong", { textContent: fmt.format(c.total) }), " contributions in the last year, ",
+    el("strong", { textContent: c.current_streak }), "-day current streak, ",
+    el("strong", { textContent: c.longest_streak }), "-day longest streak."
+  );
+  $("activity").hidden = false;
+}
+
 async function load(username) {
+  loadActivity(username).catch(() => {});
   setStatus(`Loading ${username}…`);
   try {
     const res = await fetch(`/api/profile/${encodeURIComponent(username)}`);
@@ -71,7 +92,7 @@ async function load(username) {
     setStatus("");
     history.replaceState(null, "", `?user=${encodeURIComponent(username)}`);
   } catch (err) {
-    $("profile").hidden = $("repos-section").hidden = true;
+    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = true;
     setStatus(`${err.message} Check the username and try again.`, true);
   }
 }
