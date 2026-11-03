@@ -23,6 +23,17 @@
     <p id="status" class="status" role="status">Enter a GitHub username to build a portfolio.</p>
 
     <section id="profile" class="profile" hidden>
+      <div class="match-area">
+        <div id="match-badge" class="match-badge" hidden></div>
+        <details id="match-panel" class="match-panel">
+          <summary>Check fit for a job</summary>
+          <form id="match-form">
+            <label for="jd">Paste the job description</label>
+            <textarea id="jd" rows="6" minlength="10" maxlength="20000" required placeholder="e.g. We're hiring a backend engineer with Python, Go and PostgreSQL experience…"></textarea>
+            <button type="submit">Check match</button>
+          </form>
+        </details>
+      </div>
       <div class="identity">
         <img id="avatar" class="avatar" alt="">
         <div>

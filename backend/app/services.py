@@ -2,7 +2,7 @@
 import math
 from collections import Counter
 
-from . import github_client
+from . import cache, github_client, matcher
 
 
 def _repo_card(repo: dict) -> dict:
@@ -86,3 +86,12 @@ def build_profile(username: str) -> dict:
         "top_languages": language_breakdown(repos),
         "repos": cards,
     }
+
+
+def build_match(username: str, job_description: str) -> dict:
+    """Compare JD keywords with languages from the user's cached repositories."""
+    repos = github_client.get_repos(username)
+    user_languages = {r["language"] for r in repos if r["language"]}
+    result = matcher.compute_match(job_description, user_languages)
+    cache.set_setting(f"last_jd:{username.lower()}", job_description)
+    return result

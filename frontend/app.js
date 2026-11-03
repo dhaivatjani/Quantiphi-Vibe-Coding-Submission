@@ -81,6 +81,7 @@ async function loadActivity(username) {
 
 async function load(username) {
   loadActivity(username).catch(() => {});
+  $("match-badge").hidden = true;
   setStatus(`Loading ${username}…`);
   try {
     const res = await fetch(`/api/profile/${encodeURIComponent(username)}`);
@@ -96,6 +97,33 @@ async function load(username) {
     setStatus(`${err.message} Check the username and try again.`, true);
   }
 }
+
+function renderMatch(m) {
+  const badge = $("match-badge");
+  badge.replaceChildren(
+    el("span", { className: "pct", textContent: `${m.match_percent}%` }),
+    el("span", { className: "label", textContent: m.message || "tech stack match" }),
+    el("span", { className: "chips" }, [
+      ...m.matched.map((l) => el("span", { className: "chip has", textContent: l, title: "In your repos" })),
+      ...m.missing.map((l) => el("span", { className: "chip lacks", textContent: l, title: "Not in your repos" })),
+    ])
+  );
+  badge.hidden = false;
+}
+
+$("match-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const username = new URLSearchParams(location.search).get("user");
+  const res = await fetch(`/api/match/${encodeURIComponent(username)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ job_description: $("jd").value }),
+  });
+  const data = await res.json();
+  if (!res.ok) return setStatus("Couldn't check the match. Paste at least a sentence of the job description.", true);
+  renderMatch(data);
+  $("match-panel").open = false;
+});
 
 $("lookup").addEventListener("submit", (e) => {
   e.preventDefault();

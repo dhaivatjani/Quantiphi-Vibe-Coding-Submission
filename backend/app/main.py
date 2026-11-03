@@ -2,10 +2,12 @@ import re
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 
 from . import services
 from .config import FRONTEND_DIR
 from .github_client import GitHubError
+from .matcher import MAX_JD_LENGTH
 
 app = FastAPI(title="GitHub Developer Portfolio")
 
@@ -36,6 +38,18 @@ def profile(username: str):
 def contributions(username: str):
     try:
         return services.build_contributions(_validate_username(username))
+    except GitHubError as e:
+        raise HTTPException(e.status, str(e))
+
+
+class MatchRequest(BaseModel):
+    job_description: str = Field(min_length=10, max_length=MAX_JD_LENGTH)
+
+
+@app.post("/api/match/{username}")
+def match(username: str, body: MatchRequest):
+    try:
+        return services.build_match(_validate_username(username), body.job_description)
     except GitHubError as e:
         raise HTTPException(e.status, str(e))
 

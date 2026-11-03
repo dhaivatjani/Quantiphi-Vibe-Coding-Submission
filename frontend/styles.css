@@ -11,6 +11,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body {
   margin: 0;
   background: var(--paper);
@@ -42,7 +43,30 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
 /* Profile header: the oversized name is the one loud element */
 .profile {
   display: grid; grid-template-columns: 1fr 300px; gap: 24px 48px;
-  grid-template-areas: "identity languages" "stats languages";
+  grid-template-areas: "match match" "identity languages" "stats languages";
+}
+.match-area { grid-area: match; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-start; }
+.match-badge {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  background: var(--ink); color: var(--sheet); border-radius: 12px; padding: 12px 18px;
+}
+.match-badge .pct { font: 800 2.25rem/1 var(--display); color: var(--marigold); }
+.match-badge .label { font-weight: 600; }
+.match-badge .chips { display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.8rem; }
+.chip { padding: 2px 10px; border-radius: 999px; }
+.chip.has { background: var(--cobalt); color: #fff; }
+.chip.lacks { border: 1px dashed var(--sheet); }
+.match-panel summary { cursor: pointer; font-weight: 600; color: var(--cobalt); padding: 8px 0; }
+.match-panel form { display: grid; gap: 8px; width: min(520px, 100%); }
+.match-panel label { font-size: 0.9rem; color: var(--ink-soft); }
+.match-panel textarea {
+  font: 0.95rem/1.5 var(--body); padding: 10px; border-radius: 8px;
+  border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); resize: vertical;
+}
+.match-panel button, .lookup button { justify-self: start; }
+.match-panel button {
+  font: 500 0.95rem var(--body); padding: 9px 14px; border-radius: 8px; cursor: pointer;
+  background: var(--ink); color: var(--sheet); border: 1px solid var(--ink);
 }
 .identity { grid-area: identity; display: flex; gap: 24px; align-items: flex-start; }
 .avatar { width: 96px; height: 96px; border-radius: 50%; border: 3px solid var(--ink); }
@@ -58,9 +82,9 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
 .stats dt { color: var(--ink-soft); font-size: 0.9rem; }
 .stats dd { margin: 0; font: 700 2rem/1.1 var(--display); }
 
-.languages { grid-area: languages; margin: 0; background: var(--sheet); border-radius: 12px; padding: 20px; }
+.languages { grid-area: languages; align-self: start; margin: 0; background: var(--sheet); border-radius: 12px; padding: 20px; }
 .languages figcaption { font: 700 1.1rem var(--display); margin-bottom: 12px; }
-.chart-wrap { height: 180px; }
+.chart-wrap { position: relative; height: 180px; }
 .legend { list-style: none; padding: 0; margin: 16px 0 0; font-size: 0.9rem; }
 .legend li { display: flex; justify-content: space-between; padding: 3px 0; }
 .legend .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; }
@@ -97,7 +121,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
 .lang-tag { padding: 2px 10px; border-radius: 999px; background: var(--ink); color: var(--sheet); font-size: 0.8rem; }
 
 @media (max-width: 760px) {
-  .profile { grid-template-columns: 1fr; grid-template-areas: "identity" "stats" "languages"; }
+  .profile { grid-template-columns: 1fr; grid-template-areas: "match" "identity" "stats" "languages"; }
   .identity { flex-direction: column; }
   .topbar { flex-wrap: wrap; }
 }
