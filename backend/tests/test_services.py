@@ -20,3 +20,15 @@ m = compute_match("Python and Rust engineer", {"Python", "C"})
 assert m["match_percent"] == 50 and m["matched"] == ["Python"] and m["missing"] == ["Rust"]
 assert compute_match("great communicator", {"Python"})["match_percent"] == 0
 print("matcher ok")
+
+from app.chatbot import SUGGESTIONS, detect_intent
+
+repos = ["linux", "test-tlb"]
+assert detect_intent("tell me about linux", repos) == ("repo", "linux")
+assert detect_intent("Which languages are used most?", repos)[0] == "languages"
+assert detect_intent("What's the longest streak?", repos)[0] == "activity"
+assert detect_intent("How can the job match improve?", repos)[0] == "advice"
+assert detect_intent("is this a good fit for the job", repos)[0] == "match"
+assert detect_intent("hello there", repos)[0] == "fallback"
+assert all(detect_intent(s, repos)[0] != "fallback" for s in SUGGESTIONS)
+print("chatbot ok")

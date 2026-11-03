@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import services
+from . import advisor, chatbot, services
 from .config import FRONTEND_DIR
 from .github_client import GitHubError
 from .matcher import MAX_JD_LENGTH
@@ -50,6 +50,26 @@ class MatchRequest(BaseModel):
 def match(username: str, body: MatchRequest):
     try:
         return services.build_match(_validate_username(username), body.job_description)
+    except GitHubError as e:
+        raise HTTPException(e.status, str(e))
+
+
+@app.get("/api/advice/{username}")
+def advice(username: str):
+    try:
+        return advisor.build_advice(_validate_username(username))
+    except GitHubError as e:
+        raise HTTPException(e.status, str(e))
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=500)
+
+
+@app.post("/api/chat/{username}")
+def chat(username: str, body: ChatRequest):
+    try:
+        return chatbot.reply(_validate_username(username), body.message)
     except GitHubError as e:
         raise HTTPException(e.status, str(e))
 
