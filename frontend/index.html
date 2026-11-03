@@ -4,8 +4,52 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GitHub Developer Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>GitHub Developer Portfolio</h1>
+  <header class="topbar">
+    <span class="brand">folio</span>
+    <form id="lookup" class="lookup" role="search">
+      <label for="username" class="sr-only">GitHub username</label>
+      <input id="username" name="username" placeholder="GitHub username" autocomplete="off" required>
+      <button type="submit">Show portfolio</button>
+    </form>
+  </header>
+
+  <main id="app">
+    <p id="status" class="status" role="status">Enter a GitHub username to build a portfolio.</p>
+
+    <section id="profile" class="profile" hidden>
+      <div class="identity">
+        <img id="avatar" class="avatar" alt="">
+        <div>
+          <h1 id="name" class="name"></h1>
+          <a id="handle" class="handle" target="_blank" rel="noopener"></a>
+          <p id="bio" class="bio"></p>
+        </div>
+      </div>
+      <dl class="stats">
+        <div><dt>Followers</dt><dd id="followers"></dd></div>
+        <div><dt>Total stars</dt><dd id="stars"></dd></div>
+        <div><dt>Public repos</dt><dd id="repo-count"></dd></div>
+      </dl>
+      <figure class="languages">
+        <figcaption>Top languages</figcaption>
+        <div class="chart-wrap"><canvas id="lang-chart" aria-label="Top languages chart"></canvas></div>
+        <ul id="lang-legend" class="legend"></ul>
+      </figure>
+    </section>
+
+    <section id="repos-section" class="repos-section" hidden>
+      <h2>Repositories</h2>
+      <ul id="repos" class="repos"></ul>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

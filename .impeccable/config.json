@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "frontend/index.html"
+        ],
+        "createdAt": "2026-11-03T04:18:00.903Z",
+        "reason": "Claude: avatar src is set by app.js after fetch; img sits in a hidden section until then"
+      }
+    ]
+  }
+}

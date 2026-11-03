@@ -1,0 +1,87 @@
+:root {
+  --paper: #e8edf2;      /* drafting-paper blue-grey */
+  --sheet: #f6f8fa;
+  --ink: #14213d;        /* navy ink */
+  --ink-soft: #4a5875;
+  --cobalt: #2f5bd3;
+  --marigold: #f2b134;
+  --rule: #c9d3df;
+  --display: "Bricolage Grotesque", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.55 var(--body);
+}
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+a { color: var(--cobalt); }
+:focus-visible { outline: 3px solid var(--marigold); outline-offset: 2px; }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 16px clamp(16px, 4vw, 48px);
+  border-bottom: 1px solid var(--rule);
+}
+.brand { font: 800 1.5rem var(--display); letter-spacing: -0.03em; }
+.lookup { display: flex; gap: 8px; }
+.lookup input, .lookup button {
+  font: 500 0.95rem var(--body); padding: 9px 14px; border-radius: 8px;
+  border: 1px solid var(--rule); background: var(--sheet); color: var(--ink);
+}
+.lookup input { width: min(220px, 40vw); }
+.lookup button { background: var(--ink); color: var(--sheet); border-color: var(--ink); cursor: pointer; }
+
+main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 64px; }
+.status { color: var(--ink-soft); }
+.status.error { color: #b3261e; font-weight: 500; }
+
+/* Profile header: the oversized name is the one loud element */
+.profile {
+  display: grid; grid-template-columns: 1fr 300px; gap: 24px 48px;
+  grid-template-areas: "identity languages" "stats languages";
+}
+.identity { grid-area: identity; display: flex; gap: 24px; align-items: flex-start; }
+.avatar { width: 96px; height: 96px; border-radius: 50%; border: 3px solid var(--ink); }
+.name {
+  margin: 0; font: 800 clamp(2.6rem, 7vw, 5rem)/0.95 var(--display);
+  letter-spacing: -0.04em; word-break: break-word;
+}
+.handle { display: inline-block; margin-top: 8px; font-weight: 500; }
+.bio { max-width: 60ch; color: var(--ink-soft); margin: 8px 0 0; }
+
+.stats { grid-area: stats; display: flex; gap: 40px; margin: 0; flex-wrap: wrap; align-self: end; align-items: flex-start; }
+.stats div { border-left: 3px solid var(--marigold); padding-left: 12px; }
+.stats dt { color: var(--ink-soft); font-size: 0.9rem; }
+.stats dd { margin: 0; font: 700 2rem/1.1 var(--display); }
+
+.languages { grid-area: languages; margin: 0; background: var(--sheet); border-radius: 12px; padding: 20px; }
+.languages figcaption { font: 700 1.1rem var(--display); margin-bottom: 12px; }
+.chart-wrap { height: 180px; }
+.legend { list-style: none; padding: 0; margin: 16px 0 0; font-size: 0.9rem; }
+.legend li { display: flex; justify-content: space-between; padding: 3px 0; }
+.legend .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; }
+
+.repos-section { margin-top: 56px; }
+.repos-section h2 { font: 700 1.75rem var(--display); letter-spacing: -0.02em; margin: 0 0 16px; }
+.repos {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  border-top: 2px solid var(--ink);
+}
+.repo { padding: 18px 20px 18px 0; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 8px; }
+.repo h3 { margin: 0; font: 700 1.15rem var(--display); }
+.repo h3 a { color: var(--ink); text-decoration: none; }
+.repo h3 a:hover { color: var(--cobalt); text-decoration: underline; }
+.repo p { margin: 0; color: var(--ink-soft); font-size: 0.93rem; flex: 1; }
+.repo .meta { display: flex; gap: 16px; font-size: 0.88rem; font-weight: 500; align-items: center; }
+.lang-tag { padding: 2px 10px; border-radius: 999px; background: var(--ink); color: var(--sheet); font-size: 0.8rem; }
+
+@media (max-width: 760px) {
+  .profile { grid-template-columns: 1fr; grid-template-areas: "identity" "stats" "languages"; }
+  .identity { flex-direction: column; }
+  .topbar { flex-wrap: wrap; }
+}
