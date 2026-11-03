@@ -2,9 +2,11 @@
 const $ = (id) => document.getElementById(id);
 const fmt = new Intl.NumberFormat();
 // Chart colors come from the CSS tokens so there is one source of truth.
-const rootStyle = getComputedStyle(document.documentElement);
-const PALETTE = Array.from({ length: 8 }, (_, i) => rootStyle.getPropertyValue(`--chart-${i + 1}`).trim());
-let langChart;
+const palette = () => {
+  const rootStyle = getComputedStyle(document.documentElement);
+  return Array.from({ length: 8 }, (_, i) => rootStyle.getPropertyValue(`--chart-${i + 1}`).trim());
+};
+let langChart, lastProfile;
 
 function setStatus(text, isError = false) {
   $("status").textContent = text;
@@ -19,6 +21,8 @@ function el(tag, props = {}, children = []) {
 }
 
 function renderHeader(p) {
+  lastProfile = p;
+  const PALETTE = palette();
   $("avatar").src = p.avatar_url;
   $("avatar").alt = `${p.name} avatar`;
   $("name").textContent = p.name;
@@ -329,3 +333,24 @@ if (initial) {
   $("username").value = initial;
   load(initial);
 }
+
+// Theme: explicit choice overrides the OS preference; the chart re-reads its colors.
+function currentTheme() {
+  return document.documentElement.dataset.theme
+    || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+}
+function syncThemeButton() {
+  const dark = currentTheme() === "dark";
+  $("theme-toggle").textContent = dark ? "Light mode" : "Dark mode";
+  $("theme-toggle").setAttribute("aria-pressed", dark);
+}
+$("theme-toggle").addEventListener("click", () => {
+  const next = currentTheme() === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("theme", next); } catch {}
+  syncThemeButton();
+  if (lastProfile) renderHeader(lastProfile);
+});
+syncThemeButton();
+
+$("print-btn").addEventListener("click", () => window.print());

@@ -8,15 +8,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+  </script>
 </head>
 <body>
   <header class="topbar">
     <span class="brand">folio</span>
-    <form id="lookup" class="lookup" role="search">
+<div class="topbar-actions">
+      <button id="theme-toggle" class="icon-btn" type="button" aria-pressed="false">Dark mode</button>
+      <form id="lookup" class="lookup" role="search">
       <label for="username" class="sr-only">GitHub username</label>
       <input id="username" name="username" placeholder="GitHub username" autocomplete="off" required>
       <button type="submit">Show portfolio</button>
     </form>
+    </div>
   </header>
 
   <main id="app">
@@ -24,7 +31,10 @@
 
     <section id="profile" class="profile" hidden>
       <div class="match-area">
-        <button id="match-open" class="match-open" type="button">Check fit for a job</button>
+        <div class="profile-actions">
+          <button id="match-open" class="match-open" type="button">Check fit for a job</button>
+          <button id="print-btn" class="match-open" type="button">Download as PDF</button>
+        </div>
         <div id="match-badge" class="match-badge" hidden></div>
       </div>
       <div class="identity">
