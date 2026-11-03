@@ -4,7 +4,6 @@ const fmt = new Intl.NumberFormat();
 // Chart colors come from the CSS tokens so there is one source of truth.
 const rootStyle = getComputedStyle(document.documentElement);
 const PALETTE = Array.from({ length: 8 }, (_, i) => rootStyle.getPropertyValue(`--chart-${i + 1}`).trim());
-const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let langChart;
 
 function setStatus(text, isError = false) {
@@ -38,7 +37,7 @@ function renderHeader(p) {
       labels: langs.map((l) => l.language),
       datasets: [{ data: langs.map((l) => l.percent), backgroundColor: PALETTE, borderWidth: 0 }],
     },
-    options: { maintainAspectRatio: false, cutout: "58%", animation: !reduceMotion, plugins: { legend: { display: false } } },
+    options: { maintainAspectRatio: false, cutout: "58%", plugins: { legend: { display: false } } },
   });
   $("lang-legend").replaceChildren(...langs.map((l, i) =>
     el("li", {}, [
