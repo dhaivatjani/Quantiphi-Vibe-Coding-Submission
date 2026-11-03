@@ -25,15 +25,20 @@
     <section id="profile" class="profile" hidden>
       <div class="match-area">
         <div id="match-badge" class="match-badge" hidden></div>
-        <details id="match-panel" class="match-panel">
-          <summary>Check fit for a job</summary>
-          <form id="match-form">
-            <label for="jd">Paste the job description</label>
-            <textarea id="jd" rows="6" minlength="10" maxlength="20000" required placeholder="e.g. We're hiring a backend engineer with Python, Go and PostgreSQL experience…"></textarea>
-            <button type="submit">Check match</button>
-          </form>
-        </details>
+        <button id="match-open" class="match-open" type="button">Check fit for a job</button>
       </div>
+      <dialog id="match-dialog" class="match-dialog" aria-labelledby="match-title">
+        <form id="match-form">
+          <h2 id="match-title">Check fit for a job</h2>
+          <label for="jd">Paste the job description. We'll compare the languages it asks for with the ones in these repositories.</label>
+          <textarea id="jd" rows="12" minlength="10" maxlength="20000" required placeholder="e.g. We're hiring a backend engineer with Python, Go and PostgreSQL experience…"></textarea>
+          <p id="match-error" class="match-error" role="alert" hidden></p>
+          <div class="dialog-actions">
+            <button type="button" id="match-cancel" class="secondary">Cancel</button>
+            <button type="submit">Check match</button>
+          </div>
+        </form>
+      </dialog>
       <div class="identity">
         <img id="avatar" class="avatar" alt="">
         <div>

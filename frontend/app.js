@@ -120,10 +120,20 @@ $("match-form").addEventListener("submit", async (e) => {
     body: JSON.stringify({ job_description: $("jd").value }),
   });
   const data = await res.json();
-  if (!res.ok) return setStatus("Couldn't check the match. Paste at least a sentence of the job description.", true);
+  if (!res.ok) {
+    $("match-error").textContent = "Couldn't check the match. Paste at least a sentence of the job description.";
+    $("match-error").hidden = false;
+    return;
+  }
   renderMatch(data);
-  $("match-panel").open = false;
+  $("match-dialog").close();
 });
+
+$("match-open").addEventListener("click", () => {
+  $("match-error").hidden = true;
+  $("match-dialog").showModal();
+});
+$("match-cancel").addEventListener("click", () => $("match-dialog").close());
 
 $("lookup").addEventListener("submit", (e) => {
   e.preventDefault();

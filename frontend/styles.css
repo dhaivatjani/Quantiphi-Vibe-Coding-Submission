@@ -45,7 +45,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
   display: grid; grid-template-columns: 1fr 300px; gap: 24px 48px;
   grid-template-areas: "match match" "identity languages" "stats languages";
 }
-.match-area { grid-area: match; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-start; }
+.match-area { grid-area: match; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; }
 .match-badge {
   display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
   background: var(--ink); color: var(--sheet); border-radius: 12px; padding: 12px 18px;
@@ -56,18 +56,31 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
 .chip { padding: 2px 10px; border-radius: 999px; }
 .chip.has { background: var(--cobalt); color: #fff; }
 .chip.lacks { border: 1px dashed var(--sheet); }
-.match-panel summary { cursor: pointer; font-weight: 600; color: var(--cobalt); padding: 8px 0; }
-.match-panel form { display: grid; gap: 8px; width: min(520px, 100%); }
-.match-panel label { font-size: 0.9rem; color: var(--ink-soft); }
-.match-panel textarea {
-  font: 0.95rem/1.5 var(--body); padding: 10px; border-radius: 8px;
-  border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); resize: vertical;
+.match-open {
+  font: 600 0.95rem var(--body); padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  background: transparent; color: var(--ink); border: 1.5px solid var(--ink);
 }
-.match-panel button, .lookup button { justify-self: start; }
-.match-panel button {
-  font: 500 0.95rem var(--body); padding: 9px 14px; border-radius: 8px; cursor: pointer;
+.match-open:hover { background: var(--ink); color: var(--sheet); }
+
+.match-dialog {
+  width: min(640px, calc(100vw - 32px)); padding: 28px; border: 0; border-radius: 14px;
+  background: var(--sheet); color: var(--ink);
+}
+.match-dialog::backdrop { background: rgb(20 33 61 / 0.55); }
+.match-dialog form { display: grid; gap: 12px; }
+.match-dialog h2 { margin: 0; font: 700 1.6rem var(--display); letter-spacing: -0.02em; }
+.match-dialog label { font-size: 0.93rem; color: var(--ink-soft); max-width: 60ch; }
+.match-dialog textarea {
+  font: 0.95rem/1.5 var(--body); padding: 12px; border-radius: 8px; width: 100%;
+  border: 1px solid var(--rule); background: #fff; color: var(--ink); resize: vertical;
+}
+.match-error { margin: 0; color: #b3261e; font-weight: 500; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.dialog-actions button {
+  font: 500 0.95rem var(--body); padding: 9px 16px; border-radius: 8px; cursor: pointer;
   background: var(--ink); color: var(--sheet); border: 1px solid var(--ink);
 }
+.dialog-actions .secondary { background: transparent; color: var(--ink); border-color: var(--rule); }
 .identity { grid-area: identity; display: flex; gap: 24px; align-items: flex-start; }
 .avatar { width: 96px; height: 96px; border-radius: 50%; border: 3px solid var(--ink); }
 .name {
