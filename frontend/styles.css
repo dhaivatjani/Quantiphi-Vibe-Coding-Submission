@@ -1,4 +1,4 @@
-:root {
+:root, .theme-light {
   --paper: #e8edf2;      /* drafting-paper blue-grey */
   --sheet: #f6f8fa;
   --ink: #14213d;        /* navy ink */
@@ -31,54 +31,57 @@
   --body: "IBM Plex Sans", system-ui, sans-serif;
 }
 
-:root[data-theme="dark"] {
-  --paper: #0f1626;
-  --sheet: #18223a;
-  --ink: #e6ecf5;
-  --ink-soft: #a9b6cc;
-  --cobalt: #7f9ce6;
-  --marigold: #f2b134;
-  --rule: #2c3a57;
-  --danger: #ff8a80;
-  --field: #111a2e;
-  --on-accent: #0f1626;
-  --badge-bg: #1f2d50;
-  --badge-fg: #e6ecf5;
-  --badge-muted: #a9b6cc;
-  --heat-0: #1f2a44;
-  --heat-1: #2f4a8a;
-  --heat-2: #4d6fd0;
-  --heat-3: #8fa9ec;
-  --heat-4: #dce5ff;
-  --chart-4: #4d6fd0;
-  --chart-6: #6c7a96;
-  --chart-7: #2f4a8a;
-  color-scheme: dark;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-  --paper: #0f1626;
-  --sheet: #18223a;
-  --ink: #e6ecf5;
-  --ink-soft: #a9b6cc;
-  --cobalt: #7f9ce6;
-  --marigold: #f2b134;
-  --rule: #2c3a57;
-  --danger: #ff8a80;
-  --field: #111a2e;
-  --on-accent: #0f1626;
-  --badge-bg: #1f2d50;
-  --badge-fg: #e6ecf5;
-  --badge-muted: #a9b6cc;
-  --heat-0: #1f2a44;
-  --heat-1: #2f4a8a;
-  --heat-2: #4d6fd0;
-  --heat-3: #8fa9ec;
-  --heat-4: #dce5ff;
-  --chart-4: #4d6fd0;
-  --chart-6: #6c7a96;
-  --chart-7: #2f4a8a;
-  color-scheme: dark;
+/* Dark theme is screen-only: printed PDFs always use the light tokens. */
+@media screen {
+  :root[data-theme="dark"] {
+    --paper: #0f1626;
+    --sheet: #18223a;
+    --ink: #e6ecf5;
+    --ink-soft: #a9b6cc;
+    --cobalt: #7f9ce6;
+    --marigold: #f2b134;
+    --rule: #2c3a57;
+    --danger: #ff8a80;
+    --field: #111a2e;
+    --on-accent: #0f1626;
+    --badge-bg: #1f2d50;
+    --badge-fg: #e6ecf5;
+    --badge-muted: #a9b6cc;
+    --heat-0: #1f2a44;
+    --heat-1: #2f4a8a;
+    --heat-2: #4d6fd0;
+    --heat-3: #8fa9ec;
+    --heat-4: #dce5ff;
+    --chart-4: #4d6fd0;
+    --chart-6: #6c7a96;
+    --chart-7: #2f4a8a;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+    --paper: #0f1626;
+    --sheet: #18223a;
+    --ink: #e6ecf5;
+    --ink-soft: #a9b6cc;
+    --cobalt: #7f9ce6;
+    --marigold: #f2b134;
+    --rule: #2c3a57;
+    --danger: #ff8a80;
+    --field: #111a2e;
+    --on-accent: #0f1626;
+    --badge-bg: #1f2d50;
+    --badge-fg: #e6ecf5;
+    --badge-muted: #a9b6cc;
+    --heat-0: #1f2a44;
+    --heat-1: #2f4a8a;
+    --heat-2: #4d6fd0;
+    --heat-3: #8fa9ec;
+    --heat-4: #dce5ff;
+    --chart-4: #4d6fd0;
+    --chart-6: #6c7a96;
+    --chart-7: #2f4a8a;
+    color-scheme: dark;
+    }
   }
 }
 
@@ -306,8 +309,9 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 1
 .profile-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 @media print {
-  /* Theme is switched to light in JS (beforeprint); just drop the page tint. */
   :root { --paper: #ffffff; --sheet: #ffffff; }
+  #lang-chart { display: none; }
+  .print-chart { display: block !important; height: 180px; margin: 0 auto; }
   .topbar, .profile-actions, .chat-toggle, .chat, dialog, .compare-form, #compare-status:empty { display: none !important; }
   body { background: #fff; }
   main { padding: 0; max-width: none; }
@@ -316,3 +320,4 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 1
   a { text-decoration: none; }
 }
 .theme-btn { width: 40px; height: 40px; padding: 0; display: inline-grid; place-items: center; }
+.print-chart { display: none; }

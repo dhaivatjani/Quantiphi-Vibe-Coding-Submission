@@ -2,8 +2,8 @@
 const $ = (id) => document.getElementById(id);
 const fmt = new Intl.NumberFormat();
 // Chart colors come from the CSS tokens so there is one source of truth.
-const palette = () => {
-  const rootStyle = getComputedStyle(document.documentElement);
+const palette = (from = document.documentElement) => {
+  const rootStyle = getComputedStyle(from);
   return Array.from({ length: 8 }, (_, i) => rootStyle.getPropertyValue(`--chart-${i + 1}`).trim());
 };
 let langChart, lastProfile;
@@ -20,7 +20,7 @@ function el(tag, props = {}, children = []) {
   return node;
 }
 
-function renderHeader(p, animate = true) {
+function renderHeader(p) {
   lastProfile = p;
   const PALETTE = palette();
   $("avatar").src = p.avatar_url;
@@ -42,11 +42,11 @@ function renderHeader(p, animate = true) {
       labels: langs.map((l) => l.language),
       datasets: [{ data: langs.map((l) => l.percent), backgroundColor: PALETTE, borderWidth: 0 }],
     },
-    options: { maintainAspectRatio: false, cutout: "58%", ...(animate ? {} : { animation: false }), plugins: { legend: { display: false } } },
+    options: { maintainAspectRatio: false, cutout: "58%", plugins: { legend: { display: false } } },
   });
   $("lang-legend").replaceChildren(...langs.map((l, i) =>
     el("li", {}, [
-      el("span", {}, [el("span", { className: "swatch", style: `background:${PALETTE[i]}` }), l.language]),
+      el("span", {}, [el("span", { className: "swatch", style: `background:var(--chart-${i + 1})` }), l.language]),
       el("span", { textContent: `${l.percent}%` }),
     ])
   ));
@@ -365,15 +365,18 @@ syncThemeButton();
 
 $("print-btn").addEventListener("click", () => window.print());
 
-// PDFs always use the light theme: swap before printing (also covers Ctrl+P), restore after.
-let themeBeforePrint;
+// PDFs always use light colors. The page itself stays as-is: CSS swaps tokens for print,
+// and the canvas chart is replaced by a light-colored snapshot drawn off-screen.
 addEventListener("beforeprint", () => {
-  themeBeforePrint = document.documentElement.dataset.theme;
-  document.documentElement.dataset.theme = "light";
-  if (lastProfile) renderHeader(lastProfile, false); // redraw chart in light colors, no animation
-});
-addEventListener("afterprint", () => {
-  if (themeBeforePrint) document.documentElement.dataset.theme = themeBeforePrint;
-  else delete document.documentElement.dataset.theme;
-  if (lastProfile) renderHeader(lastProfile, false);
+  if (!lastProfile) return;
+  const langs = lastProfile.top_languages.slice(0, 8);
+  const canvas = Object.assign(document.createElement("canvas"), { width: 360, height: 360 });
+  const chart = new Chart(canvas, {
+    type: "doughnut",
+    data: { labels: langs.map((l) => l.language),
+            datasets: [{ data: langs.map((l) => l.percent), backgroundColor: palette($("light-probe")), borderWidth: 0 }] },
+    options: { responsive: false, animation: false, cutout: "58%", plugins: { legend: { display: false } } },
+  });
+  $("lang-chart-print").src = canvas.toDataURL("image/png");
+  chart.destroy();
 });
