@@ -137,3 +137,12 @@ def get_repos(username: str) -> list[dict]:
         page += 1
     cache.set(key, data)
     return data
+
+
+def get_events(username: str) -> list[dict]:
+    """Recent public events (GitHub keeps roughly the last 90 days)."""
+    key = f"events:{username.lower()}"
+    if (data := cache.get(key)) is None:
+        data = _get(f"/users/{username}/events/public", {"per_page": 30})
+        cache.set(key, data)
+    return data

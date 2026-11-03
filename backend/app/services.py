@@ -204,3 +204,51 @@ def build_insights(username: str) -> dict:
         **repo_freshness(repos, now),
         **patterns,
     }
+
+
+def time_ago(iso: str, now: datetime) -> str:
+    seconds = int((now - datetime.fromisoformat(iso.replace("Z", "+00:00"))).total_seconds())
+    for unit, size in (("day", 86400), ("hour", 3600), ("minute", 60)):
+        if seconds >= size:
+            n = seconds // size
+            return f"{n} {unit}{'' if n == 1 else 's'} ago"
+    return "just now"
+
+
+def describe_event(e: dict) -> str | None:
+    """One-line summary of a GitHub event; None for event types we don't show."""
+    repo, payload, kind = e["repo"]["name"], e.get("payload", {}), e["type"]
+    if kind == "PushEvent":
+        n = payload.get("size") or len(payload.get("commits", [])) or 1
+        return f"Pushed {n} commit{'' if n == 1 else 's'} to {repo}"
+    if kind == "CreateEvent":
+        ref_type = payload.get("ref_type", "repository")
+        return f"Created repository {repo}" if ref_type == "repository" else f"Created {ref_type} {payload.get('ref')} in {repo}"
+    if kind == "PullRequestEvent":
+        pr = payload.get("pull_request", {})
+        return f"{payload.get('action', 'updated').capitalize()} pull request #{pr.get('number', '?')} in {repo}"
+    if kind == "IssuesEvent":
+        return f"{payload.get('action', 'updated').capitalize()} issue #{payload.get('issue', {}).get('number', '?')} in {repo}"
+    if kind == "IssueCommentEvent":
+        return f"Commented on #{payload.get('issue', {}).get('number', '?')} in {repo}"
+    if kind == "WatchEvent":
+        return f"Starred {repo}"
+    if kind == "ForkEvent":
+        return f"Forked {repo}"
+    if kind == "ReleaseEvent":
+        return f"Published release {payload.get('release', {}).get('tag_name', '')} of {repo}".replace("  ", " ")
+    if kind == "PullRequestReviewEvent":
+        return f"Reviewed a pull request in {repo}"
+    return None
+
+
+def build_events(username: str, limit: int = 10) -> list[dict]:
+    now = datetime.now(timezone.utc)
+    items = []
+    for e in github_client.get_events(username):
+        if (text := describe_event(e)) is not None:
+            items.append({"text": text, "type": e["type"], "repo_url": f"https://github.com/{e['repo']['name']}",
+                          "when": time_ago(e["created_at"], now), "created_at": e["created_at"]})
+        if len(items) == limit:
+            break
+    return items

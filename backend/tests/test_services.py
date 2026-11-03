@@ -78,3 +78,14 @@ b = byte_breakdown({"Python": 300, "Shell": 100})
 assert b[0] == {"language": "Python", "bytes": 300, "percent": 75.0} and b[1]["percent"] == 25.0
 assert byte_breakdown({}) == []
 print("bytes ok")
+
+from app.services import describe_event, time_ago
+
+now = datetime(2026, 11, 3, 12, tzinfo=timezone.utc)
+assert time_ago("2026-11-03T11:00:00Z", now) == "1 hour ago"
+assert time_ago("2026-11-01T12:00:00Z", now) == "2 days ago"
+assert time_ago("2026-11-03T11:59:50Z", now) == "just now"
+assert describe_event({"type": "PushEvent", "repo": {"name": "a/b"}, "payload": {"size": 3}}) == "Pushed 3 commits to a/b"
+assert describe_event({"type": "WatchEvent", "repo": {"name": "a/b"}, "payload": {}}) == "Starred a/b"
+assert describe_event({"type": "GollumEvent", "repo": {"name": "a/b"}, "payload": {}}) is None
+print("events ok")

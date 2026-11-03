@@ -216,3 +216,12 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 1
 .topics { list-style: none; padding: 0; margin: 20px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .topics li { font-size: 0.82rem; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--cobalt); color: var(--cobalt); }
 .lang-basis { display: block; font: 400 0.82rem var(--body); color: var(--ink-soft); margin-top: 2px; }
+
+/* Recent activity feed */
+.feed-section { margin-top: 40px; }
+.feed-section h2 { font: 700 1.35rem var(--display); letter-spacing: -0.02em; margin: 0 0 8px; }
+.feed { list-style: none; margin: 0; padding: 0; max-width: 720px; }
+.feed li { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--rule); font-size: 0.93rem; }
+.feed a { color: var(--ink); text-decoration: none; }
+.feed a:hover { color: var(--cobalt); text-decoration: underline; }
+.feed time { color: var(--ink-soft); white-space: nowrap; }

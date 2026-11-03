@@ -114,8 +114,22 @@ async function loadInsights(username) {
   $("insights").hidden = false;
 }
 
+async function loadFeed(username) {
+  $("feed-section").hidden = true;
+  const res = await fetch(`/api/events/${encodeURIComponent(username)}`);
+  if (!res.ok) return;
+  const items = await res.json();
+  if (!items.length) return;
+  $("feed").replaceChildren(...items.map((e) => el("li", {}, [
+    el("a", { href: e.repo_url, target: "_blank", rel: "noopener", textContent: e.text }),
+    el("time", { dateTime: e.created_at, textContent: e.when }),
+  ])));
+  $("feed-section").hidden = false;
+}
+
 async function load(username) {
   loadActivity(username).catch(() => {});
+  loadFeed(username).catch(() => {});
   loadInsights(username).catch(() => {});
   $("match-badge").hidden = $("advice").hidden = true;
   setChatOpen(false);
@@ -135,7 +149,7 @@ async function load(username) {
     setStatus("");
     history.replaceState(null, "", `?user=${encodeURIComponent(username)}`);
   } catch (err) {
-    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("insights").hidden = $("pinned-section").hidden = $("chat-toggle").hidden = true;
+    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("insights").hidden = $("pinned-section").hidden = $("feed-section").hidden = $("chat-toggle").hidden = true;
     setStatus(`${err.message} Check the username and try again.`, true);
   }
 }
