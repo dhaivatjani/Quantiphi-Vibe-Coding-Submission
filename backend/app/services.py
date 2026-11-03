@@ -55,6 +55,36 @@ def language_breakdown(repos: list[dict]) -> list[dict]:
     ]
 
 
+def byte_breakdown(sizes: dict[str, int]) -> list[dict]:
+    """Share of code bytes per language, as percentages (largest first)."""
+    total = sum(sizes.values())
+    return [
+        {"language": lang, "bytes": n, "percent": round(n * 100 / total, 1)}
+        for lang, n in sorted(sizes.items(), key=lambda kv: kv[1], reverse=True) if total
+    ]
+
+
+def languages_with_basis(username: str, repos: list[dict]) -> tuple[list[dict], str]:
+    """Prefer exact bytes of code per language; fall back to counting primary languages."""
+    try:
+        sizes = github_client.get_language_sizes(username)
+        if sizes:
+            return byte_breakdown(sizes), "bytes"
+    except GitHubError:
+        pass
+    return language_breakdown(repos), "repos"
+
+
+def user_languages(username: str, repos: list[dict]) -> set[str]:
+    """Every language the user has written: primary languages plus any found in the byte breakdown."""
+    langs = {r["language"] for r in repos if r["language"]}
+    try:
+        langs |= set(github_client.get_language_sizes(username))
+    except GitHubError:
+        pass
+    return langs
+
+
 def intensity_level(count: int, max_count: int) -> int:
     """Bucket a day's count into 0-4 relative to the busiest day."""
     if count == 0 or max_count == 0:
@@ -99,6 +129,7 @@ def build_profile(username: str) -> dict:
     user = github_client.get_user(username)
     repos = github_client.get_repos(username)
     cards = sorted((_repo_card(r) for r in repos), key=lambda c: c["stars"], reverse=True)
+    top_languages, basis = languages_with_basis(username, repos)
     return {
         "username": user["login"],
         "name": user["name"] or user["login"],
@@ -110,7 +141,8 @@ def build_profile(username: str) -> dict:
         "public_repos": user["public_repos"],
         "total_stars": sum(c["stars"] for c in cards),
         "total_forks": sum(c["forks"] for c in cards),
-        "top_languages": language_breakdown(repos),
+        "top_languages": top_languages,
+        "language_basis": basis,  # "bytes" of code, or share of "repos" without a token
         "pinned": pinned_cards(username),
         "repos": cards,
     }
@@ -119,8 +151,7 @@ def build_profile(username: str) -> dict:
 def build_match(username: str, job_description: str) -> dict:
     """Compare JD keywords with languages from the user's cached repositories."""
     repos = github_client.get_repos(username)
-    user_languages = {r["language"] for r in repos if r["language"]}
-    result = matcher.compute_match(job_description, user_languages)
+    result = matcher.compute_match(job_description, user_languages(username, repos))
     cache.set_setting(f"last_jd:{username.lower()}", job_description)
     return result
 

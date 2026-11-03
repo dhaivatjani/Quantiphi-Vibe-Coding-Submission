@@ -215,3 +215,4 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 1
 .insight-list dd { margin: 2px 0 0; font-weight: 600; }
 .topics { list-style: none; padding: 0; margin: 20px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .topics li { font-size: 0.82rem; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--cobalt); color: var(--cobalt); }
+.lang-basis { display: block; font: 400 0.82rem var(--body); color: var(--ink-soft); margin-top: 2px; }

@@ -49,7 +49,8 @@ def reply(username: str, message: str) -> dict:
                 f"with {r['stars']} stars and {r['forks']} forks.")
     elif intent == "languages":
         langs = profile["top_languages"][:3]
-        text = (f"{name} mostly works in " + _join([f"{l['language']} ({l['percent']}% of repos)" for l in langs]) + "."
+        unit = "of code" if profile["language_basis"] == "bytes" else "of repos"
+        text = (f"{name} mostly works in " + _join([f"{l['language']} ({l['percent']}% {unit})" for l in langs]) + "."
                 if langs else f"{name}'s repositories don't report a language yet.")
     elif intent == "best_repo":
         text = (f"The most starred repo is {repos[0]['name']} with {repos[0]['stars']} stars"

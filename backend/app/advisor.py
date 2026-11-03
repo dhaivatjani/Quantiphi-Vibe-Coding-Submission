@@ -1,5 +1,5 @@
 """JD gap advisor: suggest a small project for each language the JD wants but the repos lack."""
-from . import cache, github_client, matcher
+from . import cache, github_client, matcher, services
 
 PROJECT_IDEAS = {
     "Python": "Build a FastAPI service with tests that wraps a public dataset or ML model.",
@@ -33,7 +33,7 @@ def build_advice(username: str) -> dict:
         return {"has_jd": False, "match_percent": None, "suggestions": [],
                 "message": "Check fit for a job first, then come back for advice."}
     repos = github_client.get_repos(username)
-    match = matcher.compute_match(jd, {r["language"] for r in repos if r["language"]})
+    match = matcher.compute_match(jd, services.user_languages(username, repos))
     suggestions = [{"language": lang, "idea": PROJECT_IDEAS.get(lang, f"Build a small project using {lang}.")}
                    for lang in match["missing"]]
     message = ("You already cover every language this job asks for." if match["required"] and not suggestions

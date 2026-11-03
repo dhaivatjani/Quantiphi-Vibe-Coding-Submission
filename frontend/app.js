@@ -30,6 +30,7 @@ function renderHeader(p) {
   $("repo-count").textContent = fmt.format(p.public_repos);
 
   const langs = p.top_languages.slice(0, 8);
+  $("lang-basis").textContent = p.language_basis === "bytes" ? "by code size" : "by repo count";
   langChart?.destroy();
   langChart = new Chart($("lang-chart"), {
     type: "doughnut",

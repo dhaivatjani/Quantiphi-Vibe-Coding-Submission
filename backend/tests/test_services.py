@@ -71,3 +71,10 @@ now = datetime(2026, 11, 3, tzinfo=timezone.utc)
 f = repo_freshness([{"updated_at": "2026-10-20T00:00:00Z"}, {"updated_at": "2024-01-01T00:00:00Z"}], now)
 assert f == {"active_30d": 1, "inactive_1y": 1}
 print("insights ok")
+
+from app.services import byte_breakdown
+
+b = byte_breakdown({"Python": 300, "Shell": 100})
+assert b[0] == {"language": "Python", "bytes": 300, "percent": 75.0} and b[1]["percent"] == 25.0
+assert byte_breakdown({}) == []
+print("bytes ok")

@@ -74,6 +74,30 @@ def get_pinned(username: str) -> list[dict]:
     return data
 
 
+LANGUAGES_QUERY = """
+query($login: String!) {
+  user(login: $login) {
+    repositories(first: 100, ownerAffiliations: OWNER, isFork: false, orderBy: {field: PUSHED_AT, direction: DESC}) {
+      nodes { languages(first: 10, orderBy: {field: SIZE, direction: DESC}) { edges { size node { name } } } }
+    }
+  }
+}
+"""
+
+
+def get_language_sizes(username: str) -> dict[str, int]:
+    """Bytes of code per language across the user's own (non-fork) repos, in one GraphQL call.
+    shortcut: only the 100 most recently pushed repos are counted; paginate if users with more matter."""
+    key = f"langbytes:{username.lower()}"
+    if (data := cache.get(key)) is None:
+        data = {}
+        for repo in _graphql_user(LANGUAGES_QUERY, username, "Language sizes")["repositories"]["nodes"]:
+            for edge in repo["languages"]["edges"]:
+                data[edge["node"]["name"]] = data.get(edge["node"]["name"], 0) + edge["size"]
+        cache.set(key, data)
+    return data
+
+
 CONTRIBUTIONS_QUERY = """
 query($login: String!) {
   user(login: $login) {
