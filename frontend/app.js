@@ -155,8 +155,20 @@ async function loadCompare(username, other) {
     el("strong", { textContent: `Only @${c.b.username}: ` }), list(c.only_b));
   $("compare-status").textContent = `@${c.a.username} leads ${c.score.a}, @${c.b.username} leads ${c.score.b} of ${c.rows.length} metrics.`;
   $("compare-result").hidden = false;
-  history.replaceState(null, "", `?user=${encodeURIComponent(username)}&vs=${encodeURIComponent(other)}`);
+  $("compare-reset").hidden = false;
 }
+
+function resetCompare() {
+  $("compare-user").value = "";
+  $("compare-status").textContent = "";
+  $("compare-status").className = "status";
+  $("compare-result").hidden = $("compare-reset").hidden = true;
+}
+
+$("compare-reset").addEventListener("click", () => {
+  resetCompare();
+  $("compare-user").focus();
+});
 
 $("compare-form").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -164,8 +176,7 @@ $("compare-form").addEventListener("submit", (e) => {
 });
 
 async function load(username) {
-  $("compare-result").hidden = true;
-  $("compare-status").textContent = "";
+  resetCompare(); // a comparison is per visit: refresh or a new profile starts clean
   loadActivity(username).catch(() => {});
   loadFeed(username).catch(() => {});
   loadInsights(username).catch(() => {});
@@ -186,12 +197,7 @@ async function load(username) {
     $("chat-toggle").hidden = $("print-btn").hidden = false;
     $("compare-section").hidden = false;
     setStatus("");
-    const vs = new URLSearchParams(location.search).get("vs");
     history.replaceState(null, "", `?user=${encodeURIComponent(username)}`);
-    if (vs && vs.toLowerCase() !== username.toLowerCase()) {
-      $("compare-user").value = vs;
-      loadCompare(username, vs).catch(() => {});
-    }
   } catch (err) {
     $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("insights").hidden = $("pinned-section").hidden = $("feed-section").hidden = $("compare-section").hidden = $("chat-toggle").hidden = $("print-btn").hidden = true;
     setStatus(`${err.message} Check the username and try again.`, true);

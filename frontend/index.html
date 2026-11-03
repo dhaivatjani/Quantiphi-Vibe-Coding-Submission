@@ -78,6 +78,9 @@
         <label for="compare-user" class="sr-only">GitHub username to compare with</label>
         <input id="compare-user" placeholder="GitHub username" autocomplete="off" required>
         <button type="submit">Compare</button>
+        <button id="compare-reset" class="icon-btn theme-btn" type="button" aria-label="Clear comparison" title="Clear comparison" hidden>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+        </button>
       </form>
       <p id="compare-status" class="status" role="status"></p>
       <div id="compare-result" hidden>

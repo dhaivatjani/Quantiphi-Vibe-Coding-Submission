@@ -34,7 +34,7 @@ Built for the Quantiphi × DAU Vibe Coding round.
 | **At a glance** | Member since / account age, original vs forked repos, repos active in the last 30 days vs inactive for over a year, average stars per repo, total forks, most active weekday, best day, busiest month, repo topics | `services.build_insights`, `activity_patterns`, `repo_freshness` |
 | **Pinned repositories** | The repos the developer chose to pin on GitHub, shown before the full list | GraphQL `pinnedItems` → `services.pinned_cards` |
 | **Recent activity feed** | Last 10 public events ("Pushed 3 commits to X", "Opened pull request #12", "Starred Y") with relative times | `services.build_events`, `describe_event`, `time_ago` |
-| **Compare developers** | Side-by-side followers, stars, forks, repos, contributions and longest streak, the leader for each metric, and shared / unique languages. Shareable as `/?user=a&vs=b` | `services.build_compare`, `compare_rows` |
+| **Compare developers** | Side-by-side followers, stars, forks, repos, contributions and longest streak, the leader for each metric, and shared / unique languages. A reset button clears it, and refreshing the page starts fresh | `services.build_compare`, `compare_rows` |
 | **Download as PDF** | A print stylesheet hides controls and the chat, so the browser's "Save as PDF" produces a clean portfolio | `styles.css` `@media print` |
 | **Dark mode** | Follows the OS setting, with a toggle that remembers your choice. All colors come from the same CSS variables | `styles.css` tokens |
 
