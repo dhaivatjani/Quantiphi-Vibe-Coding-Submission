@@ -6,6 +6,23 @@
   --cobalt: #2f5bd3;
   --marigold: #f2b134;
   --rule: #c9d3df;
+  --white: #ffffff;
+  --danger: #b3261e;
+  /* heatmap intensity scale, empty -> busiest */
+  --heat-0: #d5dde7;
+  --heat-1: #b8c7f2;
+  --heat-2: #7f9ce6;
+  --heat-3: var(--cobalt);
+  --heat-4: var(--ink);
+  /* language chart series */
+  --chart-1: var(--cobalt);
+  --chart-2: var(--marigold);
+  --chart-3: var(--ink);
+  --chart-4: #6c8fe8;
+  --chart-5: #c9862a;
+  --chart-6: #8a97b0;
+  --chart-7: #b8c7f2;
+  --chart-8: var(--ink-soft);
   --display: "Bricolage Grotesque", system-ui, sans-serif;
   --body: "IBM Plex Sans", system-ui, sans-serif;
 }
@@ -36,14 +53,14 @@ a { color: var(--cobalt); }
 .lookup input { width: min(220px, 40vw); }
 .lookup button { background: var(--ink); color: var(--sheet); border-color: var(--ink); cursor: pointer; }
 
-main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 64px; }
+main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 112px; }
 .status { color: var(--ink-soft); }
-.status.error { color: #b3261e; font-weight: 500; }
+.status.error { color: var(--danger); font-weight: 500; }
 
 /* Profile header: the oversized name is the one loud element */
 .profile {
   display: grid; grid-template-columns: 1fr 300px; gap: 24px 48px;
-  grid-template-areas: "match match" "identity languages" "stats languages";
+  grid-template-areas: "match match" "identity languages" "stats languages" "advice advice";
 }
 .match-area { grid-area: match; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
 .match-badge {
@@ -54,7 +71,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
 .match-badge .label { font-weight: 600; }
 .match-badge .chips { display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.8rem; }
 .chip { padding: 2px 10px; border-radius: 999px; }
-.chip.has { background: var(--cobalt); color: #fff; }
+.chip.has { background: var(--cobalt); color: var(--white); }
 .chip.lacks { border: 1px dashed var(--sheet); }
 .match-open {
   font: 600 0.95rem var(--body); padding: 9px 16px; border-radius: 8px; cursor: pointer;
@@ -72,9 +89,9 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
 .match-dialog label { font-size: 0.93rem; color: var(--ink-soft); max-width: 60ch; }
 .match-dialog textarea {
   font: 0.95rem/1.5 var(--body); padding: 12px; border-radius: 8px; width: 100%;
-  border: 1px solid var(--rule); background: #fff; color: var(--ink); resize: vertical;
+  border: 1px solid var(--rule); background: var(--white); color: var(--ink); resize: vertical;
 }
-.match-error { margin: 0; color: #b3261e; font-weight: 500; }
+.match-error { margin: 0; color: var(--danger); font-weight: 500; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .dialog-actions button {
   font: 500 0.95rem var(--body); padding: 9px 16px; border-radius: 8px; cursor: pointer;
@@ -111,11 +128,11 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
   grid-auto-columns: 12px; gap: 3px; width: max-content;
 }
 .heatmap i, .heat-key i { display: block; width: 12px; height: 12px; border-radius: 2px; }
-.l0 { background: #d5dde7; }
-.l1 { background: #b8c7f2; }
-.l2 { background: #7f9ce6; }
-.l3 { background: #2f5bd3; }
-.l4 { background: #14213d; }
+.l0 { background: var(--heat-0); }
+.l1 { background: var(--heat-1); }
+.l2 { background: var(--heat-2); }
+.l3 { background: var(--heat-3); }
+.l4 { background: var(--heat-4); }
 .heat-key { display: flex; align-items: center; gap: 4px; margin-top: 10px; font-size: 0.8rem; color: var(--ink-soft); }
 
 .repos-section { margin-top: 56px; }
@@ -127,21 +144,21 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
 }
 .repo { padding: 18px 20px 18px 0; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 8px; }
 .repo h3 { margin: 0; font: 700 1.15rem var(--display); }
-.repo h3 a { color: var(--ink); text-decoration: none; }
+.repo h3 a { color: var(--ink); text-decoration: none; display: inline-block; padding: 2px 0; }
 .repo h3 a:hover { color: var(--cobalt); text-decoration: underline; }
 .repo p { margin: 0; color: var(--ink-soft); font-size: 0.93rem; flex: 1; }
 .repo .meta { display: flex; gap: 16px; font-size: 0.88rem; font-weight: 500; align-items: center; }
 .lang-tag { padding: 2px 10px; border-radius: 999px; background: var(--ink); color: var(--sheet); font-size: 0.8rem; }
 
 @media (max-width: 760px) {
-  .profile { grid-template-columns: 1fr; grid-template-areas: "match" "identity" "stats" "languages"; }
+  .profile { grid-template-columns: 1fr; grid-template-areas: "match" "identity" "stats" "languages" "advice"; }
   .identity { flex-direction: column; }
   .topbar { flex-wrap: wrap; }
 }
 
 /* JD gap advisor */
-.advice { width: min(720px, 100%); }
-.advice h3 { margin: 4px 0 8px; font: 700 1.1rem var(--display); }
+.advice { grid-area: advice; width: min(720px, 100%); }
+.advice h2 { margin: 4px 0 8px; font: 700 1.1rem var(--display); }
 .advice ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 .advice li { display: grid; grid-template-columns: 9rem 1fr; gap: 12px; font-size: 0.93rem; padding: 6px 0; border-bottom: 1px solid var(--rule); }
 .advice li strong { font-weight: 600; }
@@ -163,8 +180,8 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
 .chat-head button { background: none; border: 0; color: var(--sheet); font-size: 1.5rem; cursor: pointer; line-height: 1; }
 .chat-log { flex: 1; overflow-y: auto; list-style: none; margin: 0; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
 .chat-log li { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.93rem; }
-.chat-log .bot { background: #fff; border: 1px solid var(--rule); align-self: flex-start; }
-.chat-log .me { background: var(--cobalt); color: #fff; align-self: flex-end; }
+.chat-log .bot { background: var(--white); border: 1px solid var(--rule); align-self: flex-start; }
+.chat-log .me { background: var(--cobalt); color: var(--white); align-self: flex-end; }
 .chat-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 10px; }
 .chat-suggestions button {
   font: 500 0.8rem var(--body); padding: 4px 10px; border-radius: 999px; cursor: pointer;
@@ -173,3 +190,5 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 6
 .chat-form { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--rule); }
 .chat-form input { flex: 1; font: 0.93rem var(--body); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--rule); }
 .chat-form button { font: 500 0.93rem var(--body); padding: 8px 14px; border-radius: 8px; cursor: pointer; background: var(--ink); color: var(--sheet); border: 0; }
+.activity-error { color: var(--ink-soft); }
+

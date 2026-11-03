@@ -26,23 +26,7 @@
       <div class="match-area">
         <button id="match-open" class="match-open" type="button">Check fit for a job</button>
         <div id="match-badge" class="match-badge" hidden></div>
-        <div id="advice" class="advice" hidden>
-          <h3>Improve your match</h3>
-          <ul id="advice-list"></ul>
-        </div>
       </div>
-      <dialog id="match-dialog" class="match-dialog" aria-labelledby="match-title">
-        <form id="match-form">
-          <h2 id="match-title">Check fit for a job</h2>
-          <label for="jd">Paste the job description. We'll compare the languages it asks for with the ones in these repositories.</label>
-          <textarea id="jd" rows="12" minlength="10" maxlength="20000" required placeholder="e.g. We're hiring a backend engineer with Python, Go and PostgreSQL experience…"></textarea>
-          <p id="match-error" class="match-error" role="alert" hidden></p>
-          <div class="dialog-actions">
-            <button type="button" id="match-cancel" class="secondary">Cancel</button>
-            <button type="submit">Check match</button>
-          </div>
-        </form>
-      </dialog>
       <div class="identity">
         <img id="avatar" class="avatar" alt="">
         <div>
@@ -61,6 +45,10 @@
         <div class="chart-wrap"><canvas id="lang-chart" aria-label="Top languages chart"></canvas></div>
         <ul id="lang-legend" class="legend"></ul>
       </figure>
+      <div id="advice" class="advice" hidden>
+        <h2>Improve your match</h2>
+        <ul id="advice-list"></ul>
+      </div>
     </section>
 
     <section id="activity" class="activity" hidden>
@@ -90,6 +78,19 @@
       <button type="submit">Send</button>
     </form>
   </aside>
+
+  <dialog id="match-dialog" class="match-dialog" aria-labelledby="match-title">
+    <form id="match-form">
+      <h2 id="match-title">Check fit for a job</h2>
+      <label for="jd">Paste the job description. We'll compare the languages it asks for with the ones in these repositories.</label>
+      <textarea id="jd" rows="12" minlength="10" maxlength="20000" required placeholder="e.g. We're hiring a backend engineer with Python, Go and PostgreSQL experience…"></textarea>
+      <p id="match-error" class="match-error" role="alert" hidden></p>
+      <div class="dialog-actions">
+        <button type="button" id="match-cancel" class="secondary">Cancel</button>
+        <button type="submit">Check match</button>
+      </div>
+    </form>
+  </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="app.js"></script>

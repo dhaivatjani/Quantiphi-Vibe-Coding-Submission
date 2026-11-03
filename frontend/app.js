@@ -1,7 +1,10 @@
 // Presentation only: fetch computed data from the backend and render it.
 const $ = (id) => document.getElementById(id);
 const fmt = new Intl.NumberFormat();
-const PALETTE = ["#2f5bd3", "#f2b134", "#14213d", "#6c8fe8", "#c9862a", "#8a97b0", "#b8c7f2", "#4a5875"];
+// Chart colors come from the CSS tokens so there is one source of truth.
+const rootStyle = getComputedStyle(document.documentElement);
+const PALETTE = Array.from({ length: 8 }, (_, i) => rootStyle.getPropertyValue(`--chart-${i + 1}`).trim());
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let langChart;
 
 function setStatus(text, isError = false) {
@@ -35,7 +38,7 @@ function renderHeader(p) {
       labels: langs.map((l) => l.language),
       datasets: [{ data: langs.map((l) => l.percent), backgroundColor: PALETTE, borderWidth: 0 }],
     },
-    options: { maintainAspectRatio: false, cutout: "58%", plugins: { legend: { display: false } } },
+    options: { maintainAspectRatio: false, cutout: "58%", animation: !reduceMotion, plugins: { legend: { display: false } } },
   });
   $("lang-legend").replaceChildren(...langs.map((l, i) =>
     el("li", {}, [
@@ -62,7 +65,15 @@ function renderRepos(repos) {
 async function loadActivity(username) {
   $("activity").hidden = true;
   const res = await fetch(`/api/contributions/${encodeURIComponent(username)}`);
-  if (!res.ok) return; // heatmap is optional; profile still renders
+  if (!res.ok) {
+    // Heatmap is optional: say why it's missing instead of hiding the section.
+    const err = await res.json().catch(() => ({}));
+    $("heatmap").replaceChildren();
+    $("activity-summary").replaceChildren(el("span", { className: "activity-error",
+      textContent: `Contribution graph unavailable: ${err.detail || "GitHub didn't return activity data."}` }));
+    $("activity").hidden = false;
+    return;
+  }
   const c = await res.json();
   // Pad so the first column starts on Sunday, like a calendar.
   const pad = new Date(c.days[0].date + "T00:00:00Z").getUTCDay();
@@ -174,14 +185,17 @@ function renderSuggestions(list) {
 }
 
 function setChatOpen(open) {
+  const wasOpen = !$("chat").hidden;
   $("chat").hidden = !open;
   $("chat-toggle").hidden = open;
   $("chat-toggle").setAttribute("aria-expanded", open);
   if (open) $("chat-input").focus();
+  else if (wasOpen) $("chat-toggle").focus(); // return focus to where the user was
 }
 
 $("chat-toggle").addEventListener("click", () => setChatOpen(true));
 $("chat-close").addEventListener("click", () => setChatOpen(false));
+$("chat").addEventListener("keydown", (e) => { if (e.key === "Escape") setChatOpen(false); });
 $("chat-form").addEventListener("submit", (e) => {
   e.preventDefault();
   const msg = $("chat-input").value.trim();
