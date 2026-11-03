@@ -35,8 +35,8 @@ Built for the Quantiphi × DAU Vibe Coding round.
 | **Pinned repositories** | The repos the developer chose to pin on GitHub, shown before the full list | GraphQL `pinnedItems` → `services.pinned_cards` |
 | **Recent activity feed** | Last 10 public events ("Pushed 3 commits to X", "Opened pull request #12", "Starred Y") with relative times | `services.build_events`, `describe_event`, `time_ago` |
 | **Compare developers** | Side-by-side followers, stars, forks, repos, contributions and longest streak, the leader for each metric, and shared / unique languages. A reset button clears it, and refreshing the page starts fresh | `services.build_compare`, `compare_rows` |
-| **Download as PDF** | A print stylesheet hides controls and the chat, so the browser's "Save as PDF" produces a clean portfolio | `styles.css` `@media print` |
-| **Dark mode** | Follows the OS setting, with a toggle that remembers your choice. All colors come from the same CSS variables | `styles.css` tokens |
+| **Download as PDF** | A download icon in the top bar (or Ctrl+P). The print stylesheet hides controls and the chat. The PDF is **always in light colors**, even in dark mode, and the page on screen doesn't change: dark colors are screen-only (`@media screen`), and the chart is printed from a light-colored snapshot drawn off-screen | `styles.css` `@media print`, `app.js` `beforeprint` |
+| **Dark mode** | A sun/moon icon button in the top bar. It follows the OS setting until you choose, then remembers your choice. Both themes use the same CSS variable names, and every color pair passes WCAG AA | `styles.css` tokens |
 
 ### Additional details
 - **Job description upload:** PDF or `.txt` files; the text is extracted on the server with `pypdf` and shown in the box for review before matching.
