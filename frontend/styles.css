@@ -314,3 +314,4 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 1
   .repo, .insight-list div, .feed li, .compare-table tr { break-inside: avoid; }
   a { text-decoration: none; }
 }
+.theme-btn { width: 40px; height: 40px; padding: 0; display: inline-grid; place-items: center; }

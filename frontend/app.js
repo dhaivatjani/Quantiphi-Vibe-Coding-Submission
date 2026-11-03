@@ -341,8 +341,12 @@ function currentTheme() {
 }
 function syncThemeButton() {
   const dark = currentTheme() === "dark";
-  $("theme-toggle").textContent = dark ? "Light mode" : "Dark mode";
-  $("theme-toggle").setAttribute("aria-pressed", dark);
+  const label = dark ? "Switch to light mode" : "Switch to dark mode";
+  // Show the icon of the mode you'll switch to: moon in light mode, sun in dark mode.
+  document.querySelector(".icon-moon").toggleAttribute("hidden", dark);
+  document.querySelector(".icon-sun").toggleAttribute("hidden", !dark);
+  $("theme-toggle").setAttribute("aria-label", label);
+  $("theme-toggle").title = label;
 }
 $("theme-toggle").addEventListener("click", () => {
   const next = currentTheme() === "dark" ? "light" : "dark";
