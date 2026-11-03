@@ -205,3 +205,13 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 1
 .upload-status.error { color: var(--danger); }
 .match-badge .inferred-note { flex-basis: 100%; font-size: 0.8rem; color: var(--rule); }
 .advice li.note { display: block; }
+
+/* At a glance insights */
+.insights { margin-top: 56px; }
+.insights h2 { font: 700 1.75rem var(--display); letter-spacing: -0.02em; margin: 0 0 16px; }
+.insight-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px 32px; margin: 0; }
+.insight-list div { border-top: 1px solid var(--rule); padding-top: 8px; }
+.insight-list dt { font-size: 0.85rem; color: var(--ink-soft); }
+.insight-list dd { margin: 2px 0 0; font-weight: 600; }
+.topics { list-style: none; padding: 0; margin: 20px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.topics li { font-size: 0.82rem; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--cobalt); color: var(--cobalt); }

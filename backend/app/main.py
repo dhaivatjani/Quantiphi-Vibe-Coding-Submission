@@ -43,6 +43,14 @@ def contributions(username: str):
         raise HTTPException(e.status, str(e))
 
 
+@app.get("/api/insights/{username}")
+def insights(username: str):
+    try:
+        return services.build_insights(_validate_username(username))
+    except GitHubError as e:
+        raise HTTPException(e.status, str(e))
+
+
 @app.post("/api/job-description/extract")
 async def extract_job_description(file: UploadFile):
     data = await file.read(MAX_UPLOAD_BYTES + 1)  # read one extra byte to detect oversize files

@@ -89,8 +89,33 @@ async function loadActivity(username) {
   $("activity").hidden = false;
 }
 
+async function loadInsights(username) {
+  $("insights").hidden = true;
+  const res = await fetch(`/api/insights/${encodeURIComponent(username)}`);
+  if (!res.ok) return;
+  const i = await res.json();
+  const plural = (n, w) => `${fmt.format(n)} ${w}${n === 1 ? "" : "s"}`;
+  const facts = [
+    ["On GitHub since", `${i.member_since} (${i.account_age_years} years)`],
+    ["Repositories", `${plural(i.original_repos, "original")}, ${plural(i.forked_repos, "fork")}`],
+    ["Recently active", `${plural(i.active_30d, "repo")} updated in the last 30 days`],
+    ["Inactive", `${plural(i.inactive_1y, "repo")} untouched for over a year`],
+    ["Average stars", `${fmt.format(i.avg_stars_per_repo)} per repo, ${plural(i.total_forks, "fork")} in total`],
+    ...(i.top_weekday ? [
+      ["Most active on", `${i.top_weekday}s`],
+      ["Best day", `${plural(i.best_day.count, "contribution")} on ${i.best_day.date}`],
+      ["Busiest month", `${i.busiest_month.month} (${plural(i.busiest_month.count, "contribution")})`],
+    ] : []),
+  ];
+  $("insight-list").replaceChildren(...facts.map(([k, v]) => el("div", {}, [el("dt", { textContent: k }), el("dd", { textContent: v })])));
+  $("topics").replaceChildren(...i.top_topics.map((t) => el("li", { textContent: t })));
+  $("topics").hidden = !i.top_topics.length;
+  $("insights").hidden = false;
+}
+
 async function load(username) {
   loadActivity(username).catch(() => {});
+  loadInsights(username).catch(() => {});
   $("match-badge").hidden = $("advice").hidden = true;
   setChatOpen(false);
   $("chat-log").replaceChildren(el("li", { className: "bot", textContent: `Hi! Ask me anything about ${username}'s GitHub profile.` }));
@@ -107,7 +132,7 @@ async function load(username) {
     setStatus("");
     history.replaceState(null, "", `?user=${encodeURIComponent(username)}`);
   } catch (err) {
-    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("chat-toggle").hidden = true;
+    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("insights").hidden = $("chat-toggle").hidden = true;
     setStatus(`${err.message} Check the username and try again.`, true);
   }
 }

@@ -55,3 +55,19 @@ assert m["inferred"] == {"Python": "machine learning", "Jupyter Notebook": "stat
 assert compute_match("Python and machine learning", set())["inferred"] == {}  # explicit wins
 assert compute_match("great communicator", {"Python"})["match_percent"] == 0
 print("inference ok")
+
+from datetime import datetime, timezone
+
+from app.services import activity_patterns, repo_freshness
+
+days = [{"date": "2026-03-02", "contributionCount": 5},   # Monday
+        {"date": "2026-03-03", "contributionCount": 9},   # Tuesday
+        {"date": "2026-04-07", "contributionCount": 1}]   # Tuesday
+p = activity_patterns(days)
+assert p["top_weekday"] == "Tuesday" and p["best_day"] == {"date": "2026-03-03", "count": 9}
+assert p["busiest_month"] == {"month": "March 2026", "count": 14}
+assert activity_patterns([{"date": "2026-03-02", "contributionCount": 0}])["top_weekday"] is None
+now = datetime(2026, 11, 3, tzinfo=timezone.utc)
+f = repo_freshness([{"updated_at": "2026-10-20T00:00:00Z"}, {"updated_at": "2024-01-01T00:00:00Z"}], now)
+assert f == {"active_30d": 1, "inactive_1y": 1}
+print("insights ok")
