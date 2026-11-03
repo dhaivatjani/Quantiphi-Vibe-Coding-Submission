@@ -15,7 +15,7 @@ Built for the Quantiphi × DAU Vibe Coding round.
 | Feature | What it does | Where the logic lives |
 |---|---|---|
 | **Profile header** | Avatar, name, bio, follower count, total stars, public repo count | `services.build_profile` |
-| **Top Languages chart** | Doughnut chart and legend of the share of repos per primary language | `services.language_breakdown` |
+| **Top Languages chart** | Doughnut chart of **bytes of code per language** across the user's own repos (one GraphQL call). Without a token it falls back to the share of repos per primary language | `services.languages_with_basis`, `byte_breakdown` |
 | **Repository cards** | Name, description, language tag, stars and forks for every repo, sorted by stars | `services._repo_card` |
 | **Contribution heatmap** | Last 12 months of daily contributions as a calendar grid, colored in 5 intensity levels, plus total contributions, current streak and longest streak | `services.build_contributions`, `intensity_level`, `streaks` |
 | **GitHub API integration** | REST API for user and repos (with pagination); GraphQL API for the contribution calendar | `github_client.py` |
@@ -26,6 +26,17 @@ Built for the Quantiphi × DAU Vibe Coding round.
 
 1. **Portfolio assistant (chatbot).** A chat panel ("Ask about this portfolio") that answers questions about the profile: top languages, most popular repo, activity and streaks, stats, job fit, or any repo by name. It uses rule-based intent detection on the server, with answers built from cached data, and offers suggested-question chips.
 2. **JD gap advisor.** For every language a job description asks for that the user's repos don't have, it suggests a concrete project to close the gap. It appears as an "Improve your match" list and is also available in the chat ("How can the job match improve?").
+
+### More insights from the GitHub profile
+
+| Feature | What it shows | Logic |
+|---|---|---|
+| **At a glance** | Member since / account age, original vs forked repos, repos active in the last 30 days vs inactive for over a year, average stars per repo, total forks, most active weekday, best day, busiest month, repo topics | `services.build_insights`, `activity_patterns`, `repo_freshness` |
+| **Pinned repositories** | The repos the developer chose to pin on GitHub, shown before the full list | GraphQL `pinnedItems` → `services.pinned_cards` |
+| **Recent activity feed** | Last 10 public events ("Pushed 3 commits to X", "Opened pull request #12", "Starred Y") with relative times | `services.build_events`, `describe_event`, `time_ago` |
+| **Compare developers** | Side-by-side followers, stars, forks, repos, contributions and longest streak, the leader for each metric, and shared / unique languages. Shareable as `/?user=a&vs=b` | `services.build_compare`, `compare_rows` |
+| **Download as PDF** | A print stylesheet hides controls and the chat, so the browser's "Save as PDF" produces a clean portfolio | `styles.css` `@media print` |
+| **Dark mode** | Follows the OS setting, with a toggle that remembers your choice. All colors come from the same CSS variables | `styles.css` tokens |
 
 ### Additional details
 - **Job description upload:** PDF or `.txt` files; the text is extracted on the server with `pypdf` and shown in the box for review before matching.
@@ -140,6 +151,10 @@ chatbot ok
 plural ok
 documents ok
 inference ok
+insights ok
+bytes ok
+events ok
+compare ok
 ```
 
 ---
@@ -149,8 +164,11 @@ inference ok
 | Method | Endpoint | Body | Returns |
 |---|---|---|---|
 | GET | `/api/health` | | `{status}` |
-| GET | `/api/profile/{username}` | | User info, `total_stars`, `total_forks`, `top_languages[]`, `repos[]` |
+| GET | `/api/profile/{username}` | | User info, `total_stars`, `total_forks`, `top_languages[]`, `language_basis` (`bytes` or `repos`), `pinned[]`, `repos[]` |
 | GET | `/api/contributions/{username}` | | `total`, `current_streak`, `longest_streak`, `active_days`, `days[{date, count, level}]` |
+| GET | `/api/insights/{username}` | | `member_since`, `account_age_years`, `original_repos`, `forked_repos`, `active_30d`, `inactive_1y`, `avg_stars_per_repo`, `total_forks`, `top_topics[]`, `top_weekday`, `best_day`, `busiest_month` |
+| GET | `/api/events/{username}` | | `[{text, type, repo_url, when, created_at}]` (up to 10) |
+| GET | `/api/compare/{a}/{b}` | | `a`, `b`, `rows[{metric, a, b, leader}]`, `score`, `shared_languages`, `only_a`, `only_b` |
 | POST | `/api/job-description/extract` | multipart `file` (.pdf / .txt, ≤ 5 MB) | `{filename, text}` |
 | POST | `/api/match/{username}` | `{job_description}` (10–20,000 chars) | `match_percent`, `required`, `matched`, `missing`, `inferred`, `message` |
 | GET | `/api/advice/{username}` | | `has_jd`, `match_percent`, `suggestions[{language, idea}]`, `message` |
@@ -167,7 +185,9 @@ inference ok
 ## How the key calculations work
 
 ### Language breakdown
-Each repo's primary language (as reported by GitHub) is counted, then converted to a percentage of all repos that have a language.
+One GraphQL query fetches the language sizes (bytes) of the user's own non-fork repos and sums them per language: `percent = bytes_of_language / total_bytes × 100`. Without a token, each repo's primary language is counted instead, and the chart caption says which basis is used ("by code size" or "by repo count").
+
+The Vibe Check uses **every language found**, primary languages plus all languages in the byte breakdown. So a Dockerfile or Shell script inside a Python repo now counts.
 
 ### Heatmap intensity
 `level = ceil(4 × count / busiest_day_count)`, capped at 4; days with no contributions are level 0. Levels are relative to the user's own busiest day.
@@ -183,6 +203,15 @@ Each repo's primary language (as reported by GitHub) is counted, then converted 
 4. `match % = |required ∩ user| / |required| × 100`.
 
 The last job description is saved in the SQLite `settings` table, so the advisor and the chatbot can reuse it.
+
+### Insights
+- **Most active weekday:** contributions summed per weekday over the last year.
+- **Best day:** the single day with the most contributions.
+- **Busiest month:** contributions summed per calendar month.
+- **Freshness:** days since each repo's `updated_at`; ≤ 30 counts as active, > 365 as inactive.
+
+### Compare
+For each metric, the higher value leads (or it's a tie). The score is the number of metrics each developer leads. Languages are compared as sets: shared = A ∩ B, only A = A − B, and only B = B − A.
 
 ### Chatbot intent detection
 The server first checks whether the message names one of the user's repos. If not, it tests ordered regex rules (advice → match → languages → best repo → activity → stats) and falls back to a help message. Each intent has a reply builder that reads from the cached profile and contribution data.
@@ -206,7 +235,8 @@ The server first checks whether the message names one of the user's repos. If no
 
 ## Limitations and future work
 
-- **Language data is the primary language per repo.** A Dockerfile or C++ code inside a Python repo isn't counted. Using `/repos/{repo}/languages` would give byte-level accuracy at the cost of one extra API call per repo.
+- **Byte-level languages cover the 100 most recently pushed repos** (one GraphQL page). Users with more repos would need pagination.
+- **The activity feed** only covers GitHub's public events from roughly the last 90 days, and GitHub can delay new events by a few minutes or more.
 - **Matching is keyword-based.** Every required language counts equally; "must have" and "nice to have" aren't distinguished. Tools without a language (AWS, Kubernetes) aren't scored.
 - **The chatbot is rule-based, not generative.** It answers reliably for the supported intents but won't understand arbitrary phrasing. An LLM could be added behind the same `/api/chat` endpoint.
 - **Project ideas are a fixed lookup table** per language, not generated for the specific job description.
