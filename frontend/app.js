@@ -114,13 +114,17 @@ async function load(username) {
 
 function renderMatch(m) {
   const badge = $("match-badge");
+  const inferred = m.inferred || {};
+  const chipTitle = (l, base) => (inferred[l] ? `${base} (inferred from "${inferred[l]}")` : base);
+  const note = Object.entries(inferred).map(([l, phrase]) => `${l} from "${phrase}"`).join(", ");
   badge.replaceChildren(
     el("span", { className: "pct", textContent: `${m.match_percent}%` }),
     el("span", { className: "label", textContent: m.message || "tech stack match" }),
     el("span", { className: "chips" }, [
-      ...m.matched.map((l) => el("span", { className: "chip has", textContent: l, title: "In your repos" })),
-      ...m.missing.map((l) => el("span", { className: "chip lacks", textContent: l, title: "Not in your repos" })),
-    ])
+      ...m.matched.map((l) => el("span", { className: "chip has", textContent: inferred[l] ? `${l}*` : l, title: chipTitle(l, "In your repos") })),
+      ...m.missing.map((l) => el("span", { className: "chip lacks", textContent: inferred[l] ? `${l}*` : l, title: chipTitle(l, "Not in your repos") })),
+    ]),
+    ...(note ? [el("span", { className: "inferred-note", textContent: `* Inferred from skills: ${note}` })] : [])
   );
   badge.hidden = false;
 }
@@ -150,7 +154,7 @@ async function loadAdvice(username) {
   if (!res.ok || !a.has_jd) return;
   $("advice-list").replaceChildren(...(a.suggestions.length
     ? a.suggestions.map((s) => el("li", {}, [el("strong", { textContent: s.language }), el("span", { textContent: s.idea })]))
-    : [el("li", { textContent: a.message })]));
+    : [el("li", { className: "note", textContent: a.message })]));
   $("advice").hidden = false;
 }
 

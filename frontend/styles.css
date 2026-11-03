@@ -203,3 +203,5 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 1
 .upload-row:focus-within .upload-btn { outline: 3px solid var(--marigold); outline-offset: 2px; }
 .upload-status { font-size: 0.88rem; color: var(--ink-soft); }
 .upload-status.error { color: var(--danger); }
+.match-badge .inferred-note { flex-basis: 100%; font-size: 0.8rem; color: var(--rule); }
+.advice li.note { display: block; }

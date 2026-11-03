@@ -31,6 +31,20 @@ CASE_SENSITIVE_PATTERNS = {
     "Go": [r"(?<![\w-])Go(?![\w-])"],
 }
 
+# Skills and domains that imply a language even when the JD never names one.
+# Only used for languages the JD doesn't mention explicitly.
+IMPLIED_PATTERNS = {
+    "Python": [r"machine learning", r"deep learning", r"ml", r"ai", r"artificial intelligence",
+               r"data scien", r"computer vision", r"natural language processing", r"nlp",
+               r"speech recognition", r"generative ai", r"llms?", r"large language model",
+               r"neural network", r"regression", r"clustering"],
+    "Jupyter Notebook": [r"data analy", r"statistical model", r"exploratory", r"data visuali"],
+    "JavaScript": [r"front[- ]?end", r"web develop", r"full[- ]?stack"],
+    "SQL": [r"databases?", r"data warehous", r"etl"],
+    "Swift": [r"ios develop"],
+    "Kotlin": [r"android develop"],
+}
+
 MAX_JD_LENGTH = 20_000
 
 
@@ -46,8 +60,23 @@ def extract_languages(job_description: str) -> set[str]:
     return found
 
 
+def infer_languages(job_description: str, explicit: set[str]) -> dict[str, str]:
+    """Languages implied by skills/domains -> the phrase that implied them."""
+    inferred = {}
+    for lang, pats in IMPLIED_PATTERNS.items():
+        if lang in explicit:
+            continue
+        for p in pats:
+            if m := re.search(p, job_description, re.IGNORECASE):
+                inferred[lang] = m.group(0).lower()
+                break
+    return inferred
+
+
 def compute_match(job_description: str, user_languages: set[str]) -> dict:
-    required = extract_languages(job_description)
+    explicit = extract_languages(job_description)
+    inferred = infer_languages(job_description, explicit)
+    required = explicit | set(inferred)
     matched = sorted(required & user_languages)
     missing = sorted(required - user_languages)
     percent = round(len(matched) * 100 / len(required)) if required else 0
@@ -56,5 +85,6 @@ def compute_match(job_description: str, user_languages: set[str]) -> dict:
         "required": sorted(required),
         "matched": matched,
         "missing": missing,
-        "message": None if required else "No programming languages found in this job description.",
+        "inferred": inferred,
+        "message": None if required else "No programming languages or technical skills found in this job description.",
     }

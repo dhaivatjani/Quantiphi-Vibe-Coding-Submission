@@ -48,3 +48,10 @@ for name, data in [("jd.docx", b"x"), ("empty.txt", b"   "), ("broken.pdf", b"%P
     except DocumentError:
         pass
 print("documents ok")
+
+m = compute_match("Intern ML engineer: machine learning, computer vision and statistical modeling.", {"Python"})
+assert m["required"] == ["Jupyter Notebook", "Python"] and m["match_percent"] == 50
+assert m["inferred"] == {"Python": "machine learning", "Jupyter Notebook": "statistical model"}
+assert compute_match("Python and machine learning", set())["inferred"] == {}  # explicit wins
+assert compute_match("great communicator", {"Python"})["match_percent"] == 0
+print("inference ok")
