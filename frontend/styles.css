@@ -225,3 +225,19 @@ main { max-width: 1120px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 1
 .feed a { color: var(--ink); text-decoration: none; }
 .feed a:hover { color: var(--cobalt); text-decoration: underline; }
 .feed time { color: var(--ink-soft); white-space: nowrap; }
+
+/* Compare developers */
+.compare-section { margin-top: 56px; }
+.compare-section h2 { font: 700 1.75rem var(--display); letter-spacing: -0.02em; margin: 0 0 12px; }
+.compare-form { display: flex; gap: 8px; flex-wrap: wrap; }
+.compare-form input, .compare-form button {
+  font: 500 0.95rem var(--body); padding: 9px 14px; border-radius: 8px; border: 1px solid var(--rule);
+  background: var(--sheet); color: var(--ink);
+}
+.compare-form button { background: var(--ink); color: var(--sheet); border-color: var(--ink); cursor: pointer; }
+.compare-table { border-collapse: collapse; width: min(640px, 100%); margin-top: 8px; font-size: 0.95rem; }
+.compare-table th, .compare-table td { text-align: left; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--rule); }
+.compare-table thead th { font-weight: 600; border-bottom: 2px solid var(--ink); }
+.compare-table tbody th { font-weight: 400; color: var(--ink-soft); }
+.compare-table td.lead { font-weight: 700; color: var(--cobalt); }
+.compare-langs { font-size: 0.9rem; line-height: 1.8; margin-top: 16px; }

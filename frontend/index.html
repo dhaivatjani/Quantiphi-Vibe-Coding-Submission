@@ -57,6 +57,23 @@
       <ul id="topics" class="topics" aria-label="Repository topics"></ul>
     </section>
 
+    <section id="compare-section" class="compare-section" hidden>
+      <h2>Compare with another developer</h2>
+      <form id="compare-form" class="compare-form">
+        <label for="compare-user" class="sr-only">GitHub username to compare with</label>
+        <input id="compare-user" placeholder="GitHub username" autocomplete="off" required>
+        <button type="submit">Compare</button>
+      </form>
+      <p id="compare-status" class="status" role="status"></p>
+      <div id="compare-result" hidden>
+        <table class="compare-table">
+          <thead><tr><th scope="col">Metric</th><th scope="col" id="cmp-a"></th><th scope="col" id="cmp-b"></th></tr></thead>
+          <tbody id="compare-rows"></tbody>
+        </table>
+        <p id="compare-langs" class="compare-langs"></p>
+      </div>
+    </section>
+
     <section id="activity" class="activity" hidden>
       <h2>Contribution activity</h2>
       <p id="activity-summary" class="activity-summary"></p>

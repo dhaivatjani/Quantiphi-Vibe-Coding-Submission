@@ -59,6 +59,14 @@ def events(username: str):
         raise HTTPException(e.status, str(e))
 
 
+@app.get("/api/compare/{user_a}/{user_b}")
+def compare(user_a: str, user_b: str):
+    try:
+        return services.build_compare(_validate_username(user_a), _validate_username(user_b))
+    except GitHubError as e:
+        raise HTTPException(e.status, str(e))
+
+
 @app.post("/api/job-description/extract")
 async def extract_job_description(file: UploadFile):
     data = await file.read(MAX_UPLOAD_BYTES + 1)  # read one extra byte to detect oversize files

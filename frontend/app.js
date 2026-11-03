@@ -127,7 +127,41 @@ async function loadFeed(username) {
   $("feed-section").hidden = false;
 }
 
+async function loadCompare(username, other) {
+  $("compare-result").hidden = true;
+  $("compare-status").className = "status";
+  $("compare-status").textContent = `Comparing with ${other}…`;
+  const res = await fetch(`/api/compare/${encodeURIComponent(username)}/${encodeURIComponent(other)}`);
+  const c = await res.json();
+  if (!res.ok) {
+    $("compare-status").className = "status error";
+    $("compare-status").textContent = `${c.detail || "Couldn't compare."} Check the username and try again.`;
+    return;
+  }
+  $("cmp-a").textContent = `@${c.a.username}`;
+  $("cmp-b").textContent = `@${c.b.username}`;
+  const cell = (v, lead) => el("td", { className: lead ? "lead" : "", textContent: v === null ? "n/a" : fmt.format(v) });
+  $("compare-rows").replaceChildren(...c.rows.map((r) => el("tr", {}, [
+    el("th", { scope: "row", textContent: r.metric }), cell(r.a, r.leader === "a"), cell(r.b, r.leader === "b"),
+  ])));
+  const list = (xs) => (xs.length ? xs.join(", ") : "none");
+  $("compare-langs").replaceChildren(
+    el("strong", { textContent: "Shared languages: " }), list(c.shared_languages), el("br"),
+    el("strong", { textContent: `Only @${c.a.username}: ` }), list(c.only_a), el("br"),
+    el("strong", { textContent: `Only @${c.b.username}: ` }), list(c.only_b));
+  $("compare-status").textContent = `@${c.a.username} leads ${c.score.a}, @${c.b.username} leads ${c.score.b} of ${c.rows.length} metrics.`;
+  $("compare-result").hidden = false;
+  history.replaceState(null, "", `?user=${encodeURIComponent(username)}&vs=${encodeURIComponent(other)}`);
+}
+
+$("compare-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  loadCompare(currentUser(), $("compare-user").value.trim()).catch(() => {});
+});
+
 async function load(username) {
+  $("compare-result").hidden = true;
+  $("compare-status").textContent = "";
   loadActivity(username).catch(() => {});
   loadFeed(username).catch(() => {});
   loadInsights(username).catch(() => {});
@@ -146,10 +180,16 @@ async function load(username) {
     $("pinned-section").hidden = !data.pinned.length;
     $("profile").hidden = $("repos-section").hidden = false;
     $("chat-toggle").hidden = false;
+    $("compare-section").hidden = false;
     setStatus("");
+    const vs = new URLSearchParams(location.search).get("vs");
     history.replaceState(null, "", `?user=${encodeURIComponent(username)}`);
+    if (vs && vs.toLowerCase() !== username.toLowerCase()) {
+      $("compare-user").value = vs;
+      loadCompare(username, vs).catch(() => {});
+    }
   } catch (err) {
-    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("insights").hidden = $("pinned-section").hidden = $("feed-section").hidden = $("chat-toggle").hidden = true;
+    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("insights").hidden = $("pinned-section").hidden = $("feed-section").hidden = $("compare-section").hidden = $("chat-toggle").hidden = true;
     setStatus(`${err.message} Check the username and try again.`, true);
   }
 }

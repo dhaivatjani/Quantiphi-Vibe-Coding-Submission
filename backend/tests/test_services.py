@@ -89,3 +89,9 @@ assert describe_event({"type": "PushEvent", "repo": {"name": "a/b"}, "payload": 
 assert describe_event({"type": "WatchEvent", "repo": {"name": "a/b"}, "payload": {}}) == "Starred a/b"
 assert describe_event({"type": "GollumEvent", "repo": {"name": "a/b"}, "payload": {}}) is None
 print("events ok")
+
+from app.services import compare_rows
+
+r = compare_rows({"Stars": 5, "Repos": 2, "Streak": None}, {"Stars": 3, "Repos": 2, "Streak": 4})
+assert [x["leader"] for x in r] == ["a", "tie", None]
+print("compare ok")

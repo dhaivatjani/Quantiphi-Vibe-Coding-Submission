@@ -252,3 +252,49 @@ def build_events(username: str, limit: int = 10) -> list[dict]:
         if len(items) == limit:
             break
     return items
+
+
+def _compare_summary(username: str) -> dict:
+    profile = build_profile(username)
+    try:
+        contrib = build_contributions(username)
+    except GitHubError:
+        contrib = None
+    return {
+        "profile": profile,
+        "metrics": {
+            "Followers": profile["followers"],
+            "Total stars": profile["total_stars"],
+            "Total forks": profile["total_forks"],
+            "Public repos": profile["public_repos"],
+            "Contributions (last year)": contrib["total"] if contrib else None,
+            "Longest streak (days)": contrib["longest_streak"] if contrib else None,
+        },
+    }
+
+
+def compare_rows(a: dict, b: dict) -> list[dict]:
+    """Side-by-side metric rows with the leader of each ('a', 'b', 'tie', or None if unknown)."""
+    rows = []
+    for metric, va in a.items():
+        vb = b.get(metric)
+        leader = None if va is None or vb is None else "tie" if va == vb else "a" if va > vb else "b"
+        rows.append({"metric": metric, "a": va, "b": vb, "leader": leader})
+    return rows
+
+
+def build_compare(user_a: str, user_b: str) -> dict:
+    a, b = _compare_summary(user_a), _compare_summary(user_b)
+    langs_a = {l["language"] for l in a["profile"]["top_languages"]}
+    langs_b = {l["language"] for l in b["profile"]["top_languages"]}
+    rows = compare_rows(a["metrics"], b["metrics"])
+    wins = Counter(r["leader"] for r in rows)
+    return {
+        "a": {"username": a["profile"]["username"], "name": a["profile"]["name"], "avatar_url": a["profile"]["avatar_url"]},
+        "b": {"username": b["profile"]["username"], "name": b["profile"]["name"], "avatar_url": b["profile"]["avatar_url"]},
+        "rows": rows,
+        "score": {"a": wins["a"], "b": wins["b"]},
+        "shared_languages": sorted(langs_a & langs_b),
+        "only_a": sorted(langs_a - langs_b),
+        "only_b": sorted(langs_b - langs_a),
+    }
