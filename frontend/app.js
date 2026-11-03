@@ -183,7 +183,7 @@ async function load(username) {
     renderRepos(data.pinned, "pinned");
     $("pinned-section").hidden = !data.pinned.length;
     $("profile").hidden = $("repos-section").hidden = false;
-    $("chat-toggle").hidden = false;
+    $("chat-toggle").hidden = $("print-btn").hidden = false;
     $("compare-section").hidden = false;
     setStatus("");
     const vs = new URLSearchParams(location.search).get("vs");
@@ -193,7 +193,7 @@ async function load(username) {
       loadCompare(username, vs).catch(() => {});
     }
   } catch (err) {
-    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("insights").hidden = $("pinned-section").hidden = $("feed-section").hidden = $("compare-section").hidden = $("chat-toggle").hidden = true;
+    $("profile").hidden = $("repos-section").hidden = $("activity").hidden = $("insights").hidden = $("pinned-section").hidden = $("feed-section").hidden = $("compare-section").hidden = $("chat-toggle").hidden = $("print-btn").hidden = true;
     setStatus(`${err.message} Check the username and try again.`, true);
   }
 }

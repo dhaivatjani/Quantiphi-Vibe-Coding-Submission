@@ -17,6 +17,9 @@
   <header class="topbar">
     <span class="brand">folio</span>
 <div class="topbar-actions">
+      <button id="print-btn" class="icon-btn theme-btn" type="button" aria-label="Download portfolio as PDF" title="Download portfolio as PDF" hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+      </button>
       <button id="theme-toggle" class="icon-btn theme-btn" type="button" aria-label="Switch to dark mode" title="Switch to dark mode">
         <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" fill="currentColor"/></svg>
         <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" hidden><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>
@@ -36,7 +39,6 @@
       <div class="match-area">
         <div class="profile-actions">
           <button id="match-open" class="match-open" type="button">Check fit for a job</button>
-          <button id="print-btn" class="match-open" type="button">Download as PDF</button>
         </div>
         <div id="match-badge" class="match-badge" hidden></div>
       </div>
